@@ -14,7 +14,7 @@ def create_mockups(src_path,dest_path, json_files_folder_path):
      global image_handler
      image_handler = ImageHandler(data,json_files_folder_path)
 
-     print(f"generating mockups from src {src_path}:")
+     print(f"generating mockups from src: {studio_file_name(src_path)}:")
      if "children" in data:
           if (data['children'][0]['type'] == "page"):
                page = data['children'][0]
@@ -182,3 +182,6 @@ def create_rectangle(rect):
 
 def format_color(colorElement):
      return f"rgb({colorElement['r']},{colorElement['g']},{colorElement['b']})"
+def studio_file_name(src_path):
+     dir_name = os.path.dirname(src_path)
+     return os.path.basename(dir_name) + ".studio"

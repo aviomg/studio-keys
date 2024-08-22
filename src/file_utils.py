@@ -10,10 +10,18 @@ class FileUtils:
     output_svg_folder_name = "Studio Keys - Output/SVG Mockups"
 
     def __init__(self, input_file_path, output_folder_location):
-        self.input_file_path= input_file_path
         self.output_folder_location = output_folder_location
+
+        if os.path.isfile(input_file_path):
+            temp_dir = os.path.join(output_folder_location,"temp_studio_file")
+            os.makedirs(temp_dir,exist_ok=True)
+            shutil.copy(input_file_path,temp_dir)
+            self.input_file_path = temp_dir
+        else:
+            self.input_file_path = input_file_path
+        
         self.json_folder_path = self.create_jsons_folder_path()
-        self.snapshot_file_dict = self.create_dict(input_file_path)
+        self.snapshot_file_dict = self.create_dict(self.input_file_path)
     
     def obtain_json(self,studio_file_path):
         """studio_file_path = file path for a .studio mockup file to be converted. 
@@ -33,7 +41,7 @@ class FileUtils:
             separate subfolder. Creates a copy of original .studio file(s) and stores them in a different folder.
             file_path = file path of the orignal .studio file. new_extension = the desired file type extension"""
         if os.path.isfile(file_path):
-            dest = f"{self.output_folder_location}\{self.output_studio_folder_name}"
+            dest = f"{self.output_folder_location}/{self.output_studio_folder_name}"
             shutil.os.makedirs(dest,exist_ok=True) 
             shutil.copy2(file_path,dest)
             file_name = os.path.basename(file_path) 
@@ -98,16 +106,4 @@ class FileUtils:
     def run_studio_keys(self):
         for srcpath, dest in self.snapshot_file_dict.items():
             dest_path = self.create_folder(dest)
-            print(f"the output svg will be placed at dest_path:{dest_path}")
             create_mockups(srcpath,dest_path, self.json_folder_path)
-
-"""if __name__ == "__main__":
-    input_folder = input("Enter the file path to your .studio files: ")
-    output_folder = input("Enter the file path where you want the SVGs to be stored: ")
-
-    # Create an instance of FileUtils with the user's input
-    file_utils = FileUtils(input_folder, output_folder)
-
-    # Call methods to perform tasks
-    file_utils.perform_tasks()
-"""
