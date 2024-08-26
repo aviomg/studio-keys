@@ -1,0 +1,48 @@
+<html>
+<head>
+    <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
+
+</head>
+<br>
+<h1 class="text-5xl text-center font-bold text-green-300 ">
+    <span class="pagetext">Studio Keys</span></h1>
+    <h1 class="text-3xl font-bold text-green-600 text-center">
+        an InVision Prototype Restoration Tool
+        </h1>
+    <h1 class="text-xl text-green-700 text-center">By: Avi Kumar | 
+        <span class="text-blue-300">
+            <a href="https://github.com/aviomg/studio-keys">Github Repo</a>
+        </span> |
+        <span class="text-blue-400">
+            <a href="https://www.linkedin.com/in/avi-kumar-5041642b0/">My Linkedin</a>
+        </span>
+    </h1>
+<h1 class="m-2 ml-10">
+    <span class="text-3xl font-bold text-green-400">1.</span>
+    <span class="text-lg text-green-400">Upload your Invision Files</span>
+   </h1>
+   <h1 class="ml-10 text-md text-green-600">You will find these in your file explorer as having a ".studio" extension.</h1>
+<form method="post" enctype="multipart/form-data" action="/">
+   <!-- <label for="studio_file">Upload your .studio file:</label> -->
+    <input class="ml-10 my-2" type="file" name="studio_file" id="studio_file" accept=".studio">
+  
+    <h1 class="ml-10">
+        <span class="text-3xl font-bold text-pink-400">2.</span>
+        <span class="text-lg text-pink-400">Generate your restored mockups!</span>
+        <h1 class="ml-10 text-md text-pink-600">You will receive a zip file containing an SVG for each artboard in the InVision Studio file.</h1>
+       </h1>
+       <h1>
+        <button class="ml-10 bg-pink-500 text-pink-300 border-pink-600 border-b p-4 m-4 mr-0 rounded hover:text-white" type="submit">Generate SVGs</button>
+        {% if download_link %}
+        <span class="text-md font-bold text-purple-500">&#8594;</span>
+        <span id="downloadLink" >
+    <a href="{{download_link}}" class="bg-purple-500 hover:bg-purple-700 text-black font-bold py-2 px-4 rounded">
+        Download {{download_filename}}
+    </a>
+</span>
+{% endif %}
+       </h1>
+       
+</form>
+
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download SVG Mockups</title>
+    <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container mx-auto text-center">
+        <h1 class="text-2xl font-bold mt-10">Your SVG Mockups are ready!</h1>
+        <p class="mt-5">Click the button below to download your mockups.</p>
+        <a href="{{ url_for('download', filename=zip_filename) }}" class="mt-5 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Download {{ zip_filename }}
+        </a>
+    </div>
+</body>
+</html>

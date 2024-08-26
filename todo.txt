@@ -1,0 +1,3 @@
+- once deployed and i have to worry about safety, follow the official flask guidelines on safe file uploads (that one website)
+- fix the aboslute/relative paths issue by using dynamically created paths and running makedir in main.py
+- 
