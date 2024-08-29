@@ -68,7 +68,6 @@ def redirect_message(message_type):
 def download(filename):
     #zip_path = os.path.join("/Users/avikumar/Desktop/studio keys/studio-keys/assets/zips",filename)
     zip_path = os.path.join(app.config['ZIP_FOLDER'], filename)
-    print(f"zip path is {zip_path}")
     return send_file(zip_path,as_attachment=True)
 
 if __name__ == '__main__':
