@@ -27,6 +27,7 @@ def ensure_directories_exist():
 
 @app.route('/',methods=['POST','GET']) 
 def index():
+    ensure_directories_exist()
     if request.method == 'POST':
         if request.form.get("action") == "return_home":
             return render_template("form.html")
