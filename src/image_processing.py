@@ -26,6 +26,7 @@ class ImageHandler:
                                    if "jpeg" in ext:
                                         fileName = hash + ".jpg"
                                    filePath = self.find_file(json_files_folder_path,fileName)
+                                   #print(f"Searching for image with ID {id}: expected path {filePath}")
                                    if filePath:
                                         img_b64 = self.convert_img_base_64(filePath)
                                         if "png" in ext:
@@ -34,7 +35,7 @@ class ImageHandler:
                                              img_href = f"data:image/jpeg;base64,{img_b64}"
                                         ans[id] = img_href
                                    else:
-                                        print("no file path found")
+                                        print(f"no file path found for image ID {id} with file name {fileName}")
                               else:
                                    print("file is of type " + ext)
                else:
@@ -66,17 +67,26 @@ class ImageHandler:
              #if hash_filename in filenames:
              if lc_target in lc_filenames:
                   index = lc_filenames.index(lc_target)
-                  return os.path.join(dirpath, filenames[index])
+                  filepath = os.path.join(dirpath,filenames[index])
+                 # print(f"File found: {filepath}")
+                  return filepath
+        print(f"File {hash_filename} not found in {start_dir}")
         return None
     
     def convert_img_base_64(self, image_path):
-         with open(image_path, "rb") as image_file:
-              return base64.b64encode(image_file.read()).decode('utf-8')
+         try:
+              with open(image_path, "rb") as image_file:
+                   return base64.b64encode(image_file.read()).decode('utf-8')
+         except Exception as e:
+              print(f"Error encoding image: {e}")
+              return None
+     
 
     def create_image(self, ch):
      # Logic from create_image function
      img = 0
      resourceID = ch['resourceId'] #this is the same as the "ID" of the image dict
+    # print(f"Creating image for resourceID: {resourceID}")
      if "fills" in ch:
           if "image" in ch['fills'][0]:
                if "fit" in ch['fills'][0]['image'] and ch['fills'][0]['image']['fit'] != "fill":
@@ -87,13 +97,17 @@ class ImageHandler:
           y = ch['y']['value']
           width = ch['width']['value']
           height = ch['height']['value']
-          img = svgwrite.image.Image(href=href, insert=(x,y),size=(width,height))        
+          img = svgwrite.image.Image(href=href, insert=(x,y),size=(width,height))   
+       #   print(f"Image created with href., position: ({x}, {y}), size: ({width}, {height})")     
           if (ch['isFixedAspectRatio']):
                          img.fit(horiz='center',vert='middle', scale='meet')  
+     else:
+          print(f"Image with resourceID {resourceID} not found in href table.")
      if ch['isVisible']:
           return img
-     else:
-          print("image was not visible")      
+     elif not ch['isVisible']:
+         # print(f"image with resourceID {resourceID} was not visible") 
+          return 0     
        
     def get_image_data(self, id):
         return self.href_table.get(id)

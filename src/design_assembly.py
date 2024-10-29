@@ -81,7 +81,8 @@ def process_element(dwg, parent_group, element):
         group = dwg.g()
         tgroup = dwg.g()
         group_children = element['children']
-     #Handling image addition, sizing, placement by cross referencing 'image' children with 'rectangle' children (representing 'image backgrounds') who have the same JSON parent of type 'group'.
+     #Handling image addition, sizing, placement by cross referencing 'image' children with 
+     # 'rectangle' children (representing 'image backgrounds') who have the same JSON parent of type 'group'.
         if len(group_children) == 3 or len(group_children) == 2:
              for ch in group_children:
                   if ch['type'] == "image" and (ch['isVisible']):

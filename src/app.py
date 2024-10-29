@@ -51,6 +51,7 @@ def index():
 
         shutil.rmtree(file_processor.session_output_folder,ignore_errors=True)
 
+
         return render_template('form.html',download_link = download_link, download_filename=zip_filename)
     return render_template("form.html")
 
