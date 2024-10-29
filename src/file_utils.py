@@ -8,13 +8,13 @@ import uuid
 class FileUtils:
     output_json_folder_name = "Studio Keys - Output/JSON Data (Ignore)"
     output_studio_folder_name = "Studio Keys - Output/Copy of .studio Files (Ignore)"
-    output_svg_folder_name = "Studio Keys - Output" #removed Studio Keys - Output/SVG Mockups
+    output_svg_folder_name = "Studio Keys - Output" #removed "Studio Keys - Output/SVG Mockups"
 
     def __init__(self, input_file_path, output_folder_location):
         self.output_folder_location = output_folder_location
         self.session_id = str(uuid.uuid4())
         self.session_output_folder = os.path.join(output_folder_location,f"Studio_Keys_Output_{self.session_id}")
-        self.output_svg_folder_name = os.path.join(self.session_output_folder,"SVG Mockups")
+        self.output_svg_folder_name = os.path.join(self.session_output_folder,"Studio Keys - Output/SVG Mockups")
 
 
         if os.path.isfile(input_file_path):
