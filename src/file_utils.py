@@ -1,19 +1,24 @@
 import os
 import shutil
 from design_assembly import create_mockups
+import uuid
 """Class for helper functions performing file managing and processing tasks, such as converting the .studio files into zip archives,
     extracting the necessary JSON file, directory organization, etc."""
 
 class FileUtils:
     output_json_folder_name = "Studio Keys - Output/JSON Data (Ignore)"
     output_studio_folder_name = "Studio Keys - Output/Copy of .studio Files (Ignore)"
-    output_svg_folder_name = "Studio Keys - Output/SVG Mockups"
+    output_svg_folder_name = "Studio Keys - Output" #removed Studio Keys - Output/SVG Mockups
 
     def __init__(self, input_file_path, output_folder_location):
         self.output_folder_location = output_folder_location
+        self.session_id = str(uuid.uuid4())
+        self.session_output_folder = os.path.join(output_folder_location,f"Studio_Keys_Output_{self.session_id}")
+        self.output_svg_folder_name = os.path.join(self.session_output_folder,"SVG Mockups")
+
 
         if os.path.isfile(input_file_path):
-            temp_dir = os.path.join(output_folder_location,"temp_studio_file")
+            temp_dir = os.path.join(self.session_output_folder,"temp_studio_file")
             os.makedirs(temp_dir,exist_ok=True)
             shutil.copy(input_file_path,temp_dir)
             self.input_file_path = temp_dir
@@ -40,21 +45,28 @@ class FileUtils:
         """Helper function for obtain_json which converts .studio file into zip archive and extracts contents into a 
             separate subfolder. Creates a copy of original .studio file(s) and stores them in a different folder.
             file_path = file path of the orignal .studio file. new_extension = the desired file type extension"""
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"The file {file_path} does not exist!!")
         if os.path.isfile(file_path):
             dest = f"{self.output_folder_location}/{self.output_studio_folder_name}"
+            #dest = f"{self.session_output_folder}/{self.output_studio_folder_name}"
             shutil.os.makedirs(dest,exist_ok=True) 
             shutil.copy2(file_path,dest)
             file_name = os.path.basename(file_path) 
             base_name, _ = os.path.splitext(file_name) 
             new_file_name = f"{base_name}.{new_extension}" 
-            new_file_path = os.path.join(self.output_folder_location,self.output_json_folder_name,new_file_name)
+            #new_file_path = os.path.join(self.output_folder_location,self.output_json_folder_name,new_file_name)
+            new_file_path = os.path.join(self.session_output_folder,self.output_json_folder_name,new_file_name)
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(f"The file {file_path} does not exist!!")
             os.rename(file_path, new_file_path)
             return new_file_path
         else:
             print(f"Could not find file: {file_path}")
 
     def create_jsons_folder_path(self):
-        json_folder_path = os.path.join(self.output_folder_location, self.output_json_folder_name)
+        #json_folder_path = os.path.join(self.output_folder_location, self.output_json_folder_name)
+        json_folder_path = os.path.join(self.session_output_folder, self.output_json_folder_name)
         os.makedirs(json_folder_path,exist_ok=True)
         return json_folder_path
 
@@ -98,10 +110,11 @@ class FileUtils:
     def create_folder(self,name):
         """Creates a folder to store the generated mockups/artboards of a .studio file
             name = the name of the subfolder, given by create_dict (see above)"""
-        folder_path1 = os.path.join(self.output_folder_location,self.output_svg_folder_name)
-        folder_path = f"{folder_path1}/{name}"
-        os.makedirs(folder_path, exist_ok=True)
-        return folder_path
+       # folder_path1 = os.path.join(self.output_folder_location,self.output_svg_folder_name)
+        folder_path1 = os.path.join(self.output_svg_folder_name,name.strip("/"))
+        #folder_path = f"{folder_path1}/{name}"
+        os.makedirs(folder_path1, exist_ok=True)
+        return folder_path1
     
     def run_studio_keys(self):
         for srcpath, dest in self.snapshot_file_dict.items():

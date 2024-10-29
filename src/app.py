@@ -4,6 +4,7 @@ from fileinput import filename
 from werkzeug.utils import secure_filename
 import os
 from zip_utils import create_zip
+import shutil
 
 
 app = Flask(__name__)
@@ -44,9 +45,11 @@ def index():
         file_processor.run_studio_keys()
 
        # print(f"calling create zip with filename {f.filename}")
-        zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'])
+        zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
         zip_filename = os.path.basename(zip_path)
         download_link = url_for('download',filename=zip_filename)
+
+        shutil.rmtree(file_processor.session_output_folder,ignore_errors=True)
 
         return render_template('form.html',download_link = download_link, download_filename=zip_filename)
     return render_template("form.html")
