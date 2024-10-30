@@ -5,27 +5,28 @@ A Python-based tool designed that enables the easy retrieval and recovery of oth
 [Click here to access the web application!](https://studio-keys.onrender.com/)
 
 ## Motivation
-Imagine that you are an artist who has spent countless man-hours developing a rich portfolio of oil paintings. You stored these valuable pieces in a temperature-controlled locker, where they would be safe and easily accessible to you should you ever need them. 
+My mom is a painter, and she gave me an interesting analogy. Imagine you were an artist who has spent endless man-hours developing this diverse portfolio of oil paintings. You kept these valuable pieces in a temperature-controlled storage locker, where they'd be safe but easily accessible when you need them.
 
-Now imagine that the safelocker was left out in the sun. Your paintings might still be okay, or maybe not. It'd be easy enough to find out...except you've also lost the key. Despite having the safelocker right in front of your eyes, your paintings are, for all intents and purposes, lost. But what if you could get them back?  
+One day, you come home to a flood, everything in your home soaked in water, if not fully washed away. Your locker is waterproof, though, so your paintings are okay, thank god. Only then, you realize that the key, which is usually sitting on your desk, the kitchen table, or some other absentminded counter, was washed away. Now what?
 
-InVision Studio was a popular prototyping tool for creating UI/UX designs (think Figma, Sketch, etc.). But with its abrupt discontinuation of all services (read about it [here](https://www.feedme.design/invisions-prototyping-tool-the-unexpected-reappearance-and-abrupt-goodbye/), [here](https://support.invisionapp.com/), or [here](https://dorve.c.om/blog/ux-news-articles-archive/invision-shutting-down/)), many designers and developers found themselves unable to access their designs, all of which are saved by default in an InVision-specific file extension, `.studio`, that can't be opened without the platform. Studio Keys was developed to address this need by providing an reliable way to convert these inaccessible files into SVGs, ensuring that valuable design work is not lost and can be reused in other projects or platforms.  
+Despite having the storage locker right in front of your eyes, your paintings are, for all intents and purposes, lost. But what if you could get them back?  
+
+InVision Studio was a popular prototyping tool for creating UI/UX designs (think Figma, Sketch, etc.). But with its abrupt discontinuation of all services (read about it [here](https://www.feedme.design/invisions-prototyping-tool-the-unexpected-reappearance-and-abrupt-goodbye/), [here](https://support.invisionapp.com/), or [here](https://dorve.c.om/blog/ux-news-articles-archive/invision-shutting-down/)), many designers and developers found themselves unable to access their designs, all of which are saved by default in an InVision-specific file extension, `.studio`, that can't be opened without the desktop application. Studio Keys was developed to address this need by providing an reliable way to convert these once-inaccessible files into SVGs, ensuring that valuable design work is not lost and can be reused in other projects or platforms.  
 
 ## Project Overview
 
 Studio Keys is a Python program that:
-
-- Parses and processes `.studio` files, extracting the necessary data.
-- Converts the design elements (e.g., rectangles, text, images) into SVG format.
+- Processes `.studio` files to extract the necessary data in JSON format.
+- Parses and processes the JSON files to convert the design elements (e.g., rectangles, text, images) into SVG format.
 - Outputs the SVG files, maintaining the correct layering and structure of the original design.
 
-The program can handle both individual `.studio` files and folders containing multiple `.studio` files. Users can specify the input and output locations, and the tool will generate the SVG files in the desired directory.
+The program allows a user to upload their `.studio` files, and then outputs a downloadable .zip containing an SVG for each artboard in the file.
 
 ### Key Features
-
-- **Batch Processing**: Convert multiple `.studio` files at once by providing a folder path.
-- **Single File Conversion**: Easily convert individual `.studio` files.
-- **Output Customization**: Choose where to save the generated SVG mockups.
+- **Effortless Conversion Process**: Users can upload `.studio` files and download neatly packaged SVG mockups with a single click, simplifying the process of turning design files into web-compatible assets.
+- **Intuitive Web Interface**: A user-friendly Flask-powered web interface ensures a smooth user experience, making it simple for users of all technical backgrounds to upload files and retrieve SVG outputs.
+- **Scalable and Modular Codebase**: Designed with scalability in mind, the project’s modular code structure makes it easy to extend functionality, accommodating future enhancements and customizations.
+- **Customizable for Diverse Needs**: The program can be tailored to meet specific requirements, whether by adjusting SVG layouts or tweaking conversion settings, offering flexibility for various design workflows.
 
 ### Usage/Installation Instructions [unfinished]
 ### Examples/Demo
