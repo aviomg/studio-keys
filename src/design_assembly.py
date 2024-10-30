@@ -94,11 +94,26 @@ def process_element(dwg, parent_group, element):
                          n2 = ch['name']
                          rectangle = ch
              if hasRec and hasImg and image != 0 and rectangle !=0:
+                  #print(f"found a group. name={element['name']}. id={element['id']}")
+               #   for ch in group_children:
+                       #if ch['type'] == 'rectangle':
+                            # print(f"child: name={ch['name']},type={ch['type']}, color={ch['fills'][0]['type']},{format_color(ch['fills'][0]['color'])}")
+                       #else:
+                           # print(f"child: name={ch['name']},type={ch['type']}")
+                      # if len(group_children) != 2:
+                           # print(f"group of size {len(group_children)}")
+                 
                   id = image['resourceId']
                   x = rectangle['x']['value']
                   y = rectangle['y']['value']
                   width = rectangle['width']['value']
                   height = rectangle['height']['value']
+                  imgx = image['x']['value']
+                  imgy = image['y']['value']
+                  imgw = image['width']['value']
+                  imgh = image['height']['value']
+               #   print(f"x(img,rect): {imgx},{x}....y: {imgy},{y}....width:{imgw},{width}...height:{imgh},{height}")
+                #  print("\n")
                   imageTable[id] = attributes(x, y, width, height)
      #Handles children of type 'group' by recursively calling process_element on each child of the group:
         for ch in group_children:
