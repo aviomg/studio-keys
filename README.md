@@ -27,12 +27,26 @@ The program allows a user to upload their `.studio` files, and then outputs a do
 - **Intuitive Web Interface**: A user-friendly Flask-powered web interface ensures a smooth user experience, making it simple for users of all technical backgrounds to upload files and retrieve SVG outputs.
 - **Scalable and Modular Codebase**: Designed with scalability in mind, the project’s modular code structure makes it easy to extend functionality, accommodating future enhancements and customizations.
 - **Customizable for Diverse Needs**: The program can be tailored to meet specific requirements, whether by adjusting SVG layouts or tweaking conversion settings, offering flexibility for various design workflows.
+### Usage
+- Navigate to the web application at https://studio-keys.onrender.com, and follow the instructions to upload a .studio file from your computer. The program will output a .zip file to a folder containing an SVG for each artboard rendered from the file. 
+- Studio Keys will delete your data after mockup creation is complete.
 
-### Usage/Installation Instructions [unfinished]
-### Examples/Demo
-### The Process/Lessons Learned
+### Examples
+- I owe the motivation for this entire project to my manager, who tasked me with it to recover ~600 mockups that he possessed. He was kind enough to allow me to provide some of the mockups that I rendered for examples.
+- To try the program out for yourself, download one of the sample `.studio` files from /resources/sample_studio_files and upload it to the web application.
+- View some sample generated mockups in /resources/sample_generated_svgs
+
+### Call for Contributors
+- Want to be part of the process of improving this awesome program? I am in the continuous process of improving the program to create more precise, refined mockups, and the key to this is my database of diverse .studio files that I use to gain a better understanding of the logic behind the now-extinct Invision app. If you would like to volunteer your .studio files for this cause, please reach out to me at avikumar2048@gmail.com!
+
+### Technical Details
+### How it Works
+### Known Issues & Limitations
 ### Future work
 ### License
+### Acknowledgements
+### The Process/Lessons Learned
+
 
 
  
