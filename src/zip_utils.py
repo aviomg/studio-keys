@@ -14,12 +14,22 @@ def create_zip(output_path, studio_file_name,zip_folder,session_output_folder):
 
     #output_svg_path = os.path.join(output_path, "Studio Keys - Output")
 
+#THIS IS THE FIX THAT REMOVES THE JSON FOLDER FROM ALSO BEING SAVED W IT. The commented out chunk below is what i was using
+#before
+    svg_output_path = os.path.join(session_output_folder, "Studio Keys - Output/SVG Mockups")
     with zipfile.ZipFile(zip_path,'w') as zipf: 
-         #for root, _, files in os.walk(output_svg_path):
-         for root, dirs, files in os.walk(session_output_folder):
-             for file in files:
-                 file_path = os.path.join(root,file)
-                 zipf.write(file_path, os.path.relpath(file_path,session_output_folder))
+        for root,_,files in os.walk(svg_output_path):
+            for file in files:
+                file_path = os.path.join(root,file)
+                zipf.write(file_path, os.path.relpath(file_path, session_output_folder))
+
+
+    '''with zipfile.ZipFile(zip_path,'w') as zipf: 
+           #for root, _, files in os.walk(output_svg_path):
+           for root, dirs, files in os.walk(session_output_folder):
+               for file in files:
+                   file_path = os.path.join(root,file)
+                   zipf.write(file_path, os.path.relpath(file_path,session_output_folder))'''
 
 
 
