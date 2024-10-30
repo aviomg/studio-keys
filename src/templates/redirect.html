@@ -5,11 +5,12 @@
         <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
         <title>Error</title>
     </head>
-        <body>
-            <p>{{message}}</p>
+    <body class="bg-[#e0e0ce]">
+        <br>
+        <h1 class="text-xl text-[#F08700] text-center">{{message}}</h1>
             <form method=post action="/">
                 <input type="hidden" name="action" value="return_home">
-                <input class="bg-green-300 border-green-600 border-b p-4 m-4 rounded hover:text-white text-sm" type="submit" value="Return to homepage" name="Submit" id="frm1_submit" />
+                <input class="bg-green-300 border-green-600 border-b p-4 m-4 rounded hover:text-white text-sm text-center" type="submit" value="Return to homepage" name="Submit" id="frm1_submit" />
             </form>
         </body>
    
