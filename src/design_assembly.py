@@ -12,7 +12,7 @@ def create_mockups(src_path,dest_path, json_files_folder_path):
      with open(src_path, 'r', encoding='utf-8') as f:
           data = json.load(f)
      global image_handler
-     image_handler = ImageHandler(data,json_files_folder_path)
+     image_handler = ImageHandler(data,json_files_folder_path,src_path)
 
      print(f"generating mockups from src: {studio_file_name(src_path)}:")
      if "children" in data:
@@ -22,7 +22,9 @@ def create_mockups(src_path,dest_path, json_files_folder_path):
           for ch in page['children']: #Creates a separate SVG file for each artboard, each of which represent 1 mockup.
                if ch['type'] == "artboard":
                     artboard = ch
-                    name = artboard['name'] + ".svg"
+                    name1 = artboard['name'] + ".svg"
+                    #ACCOUNTING FOR THE ARTBOARD NAME INCLUDING A SLASH:
+                    name = name1.replace("/","-")
                     print("creating " + name)
                     create_artboard(artboard,name, dest_path)
 

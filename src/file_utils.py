@@ -10,23 +10,39 @@ class FileUtils:
     output_studio_folder_name = "Studio Keys - Output/Copy of .studio Files (Ignore)"
     output_svg_folder_name = "Studio Keys - Output" #removed "Studio Keys - Output/SVG Mockups"
 
-    def __init__(self, input_file_path, output_folder_location):
-        self.output_folder_location = output_folder_location
-        self.session_id = str(uuid.uuid4())
-        self.session_output_folder = os.path.join(output_folder_location,f"Studio_Keys_Output_{self.session_id}")
-        self.output_svg_folder_name = os.path.join(self.session_output_folder,"Studio Keys - Output/SVG Mockups")
+    def __init__(self, input_file_path, output_folder_location, unique=True):
+        if unique:
+            self.output_folder_location = output_folder_location
+            self.session_id = str(uuid.uuid4())
+            self.session_output_folder = os.path.join(output_folder_location,f"Studio_Keys_Output_{self.session_id}")
+            self.output_svg_folder_name = os.path.join(self.session_output_folder,"Studio Keys - Output/SVG Mockups")
 
 
-        if os.path.isfile(input_file_path):
-            temp_dir = os.path.join(self.session_output_folder,"temp_studio_file")
-            os.makedirs(temp_dir,exist_ok=True)
-            shutil.copy(input_file_path,temp_dir)
-            self.input_file_path = temp_dir
-        else:
-            self.input_file_path = input_file_path
+            if os.path.isfile(input_file_path):
+                temp_dir = os.path.join(self.session_output_folder,"temp_studio_file")
+                os.makedirs(temp_dir,exist_ok=True)
+                shutil.copy(input_file_path,temp_dir)
+                self.input_file_path = temp_dir
+            else:
+                self.input_file_path = input_file_path
         
-        self.json_folder_path = self.create_jsons_folder_path()
-        self.snapshot_file_dict = self.create_dict(self.input_file_path)
+            self.json_folder_path = self.create_jsons_folder_path()
+            self.snapshot_file_dict = self.create_dict(self.input_file_path)
+        else:
+            self.output_folder_location = output_folder_location
+            self.session_output_folder = os.path.join(output_folder_location,f"Studio_Keys_Output")
+            self.output_svg_folder_name = os.path.join(self.session_output_folder,"Studio Keys - Output/SVG Mockups")
+
+            if os.path.isfile(input_file_path):
+                temp_dir = os.path.join(self.session_output_folder,"temp_studio_file")
+                os.makedirs(temp_dir,exist_ok=True)
+                shutil.copy(input_file_path,temp_dir)
+                self.input_file_path = temp_dir
+            else:
+                self.input_file_path = input_file_path
+        
+            self.json_folder_path = self.create_jsons_folder_path()
+            self.snapshot_file_dict = self.create_dict(self.input_file_path)
     
     def obtain_json(self,studio_file_path):
         """studio_file_path = file path for a .studio mockup file to be converted. 
@@ -74,9 +90,12 @@ class FileUtils:
         """Helper function for obtain_json which extracts the contents of zip archive."""
         if os.path.isfile(zip_path):
             extract_to = os.path.splitext(zip_path)[0]
-            shutil.unpack_archive(zip_path,extract_to,"zip")
-            os.remove(zip_path)
-            return extract_to
+            try:
+                shutil.unpack_archive(zip_path,extract_to,"zip")
+                os.remove(zip_path)
+                return extract_to
+            except shutil.ReadError:
+                print(f"{os.path.basename(zip_path)} couldn't be unzipped. Skipping this file.")
         else:
             print(f"Could not find file: {zip_path}")
 
@@ -104,7 +123,10 @@ class FileUtils:
             dest_for_svgs = f"/{base_name}"
             if os.path.isfile(full_path):
                 jsonpath = self.obtain_json(full_path)
-                mockup_dict[jsonpath] = dest_for_svgs
+                if jsonpath:
+                    mockup_dict[jsonpath] = dest_for_svgs
+                else:
+                    print(f"Skipping file {filename} as it couldn't be unzipped or parsed.")
         return mockup_dict
 
     def create_folder(self,name):
@@ -119,4 +141,5 @@ class FileUtils:
     def run_studio_keys(self):
         for srcpath, dest in self.snapshot_file_dict.items():
             dest_path = self.create_folder(dest)
+            print(f"sending srcpath as {srcpath} for {dest}")
             create_mockups(srcpath,dest_path, self.json_folder_path)
