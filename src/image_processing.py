@@ -4,10 +4,15 @@ import base64
 import svgwrite
 
 class ImageHandler:
-    def __init__(self, json_data, json_files_folder_path):
+    def __init__(self, json_data, json_files_folder_path,studio_file_path_name):
         self.json_files_folder_path = json_files_folder_path
+        self.studio_file_name = self.get_studio_file_name(studio_file_path_name)
         self.href_table = self.create_href_table(json_data, json_files_folder_path)
         self.size_table = self.create_size_table(json_data)
+        
+    def get_studio_file_name(self,studio_file_path_name):
+         parts = studio_file_path_name.strip().split(os.sep)
+         return parts[-2]
 
     def create_href_table(self, json_data, json_files_folder_path):
       # Logic from image_dict function
@@ -35,7 +40,7 @@ class ImageHandler:
                                              img_href = f"data:image/jpeg;base64,{img_b64}"
                                         ans[id] = img_href
                                    else:
-                                        print(f"no file path found for image ID {id} with file name {fileName}")
+                                        print(f"no file path found for image ID {id} with file name {fileName} in {self.studio_file_name}")
                               else:
                                    print("file is of type " + ext)
                else:
