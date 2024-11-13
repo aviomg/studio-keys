@@ -25,7 +25,8 @@ def create_mockups(src_path,dest_path, json_files_folder_path):
                     name1 = artboard['name'] + ".svg"
                     #ACCOUNTING FOR THE ARTBOARD NAME INCLUDING A SLASH:
                     name = name1.replace("/","-")
-                    print("creating " + name)
+                    #if name == "branch-guest-1280.svg":
+                    #print("creating " + name)
                     create_artboard(artboard,name, dest_path)
 
 def create_artboard(artboard, name,save_to):
@@ -86,24 +87,26 @@ def process_element(dwg, parent_group, element):
      #Handling image addition, sizing, placement by cross referencing 'image' children with 
      # 'rectangle' children (representing 'image backgrounds') who have the same JSON parent of type 'group'.
         if len(group_children) == 3 or len(group_children) == 2:
+             #print(f"ground group {element['name']} with length {len(group_children)}")
              for ch in group_children:
                   if ch['type'] == "image" and (ch['isVisible']):
                        hasImg = True
                        image = ch
                   if ch['type'] == "rectangle":
+                       #if "isVisible" in ch and (ch['isVisible']) and ("bg" in ch['name']):
                        if "isVisible" in ch and (ch['isVisible']):
                          hasRec = True
                          n2 = ch['name']
                          rectangle = ch
              if hasRec and hasImg and image != 0 and rectangle !=0:
-                  #print(f"found a group. name={element['name']}. id={element['id']}")
-               #   for ch in group_children:
-                       #if ch['type'] == 'rectangle':
-                            # print(f"child: name={ch['name']},type={ch['type']}, color={ch['fills'][0]['type']},{format_color(ch['fills'][0]['color'])}")
+                 # print(f"found a group. name={element['name']}. id={element['id']}")
+                  #for ch in group_children:
+                      # if ch['type'] == 'rectangle':
+                       #      print(f"child: name={ch['name']},type={ch['type']}, color={ch['fills'][0]['type']},{format_color(ch['fills'][0]['color'])}")
                        #else:
-                           # print(f"child: name={ch['name']},type={ch['type']}")
-                      # if len(group_children) != 2:
-                           # print(f"group of size {len(group_children)}")
+                        #    print(f"child: name={ch['name']},type={ch['type']}")
+                       #if len(group_children) != 2:
+                        #    print(f"group of size {len(group_children)}")
                  
                   id = image['resourceId']
                   x = rectangle['x']['value']
@@ -117,6 +120,7 @@ def process_element(dwg, parent_group, element):
                #   print(f"x(img,rect): {imgx},{x}....y: {imgy},{y}....width:{imgw},{width}...height:{imgh},{height}")
                 #  print("\n")
                   imageTable[id] = attributes(x, y, width, height)
+                 # print(f"added image id {id} to table with width={width} and height={height}")
      #Handles children of type 'group' by recursively calling process_element on each child of the group:
         for ch in group_children:
             if ch['type'] == 'rectangle' and "container" in ch['name']:
@@ -142,7 +146,8 @@ def process_element(dwg, parent_group, element):
                     else:
                          parent_group.add(el)
           elif element['type'] == 'image':
-               img = image_handler.create_image(element)
+              # print(f"processing image with name {element['name']}")
+               img = image_handler.create_image(element,imageTable)
                if img != 0:
                     parent_group.add(img)
 
