@@ -15,6 +15,7 @@ class ImageHandler:
          return parts[-2]
 
     def create_href_table(self, json_data, json_files_folder_path):
+         
       # Logic from image_dict function
           ans = {}
           if "resources" in json_data:
@@ -31,8 +32,15 @@ class ImageHandler:
                                    if "jpeg" in ext:
                                         fileName = hash + ".jpg"
                                    filePath = self.find_file(json_files_folder_path,fileName)
+                                   if not filePath and "jpeg" in ext: 
+                                        #print("trying again with jpeg")
+                                        fileName = hash + ".jpeg"
+                                        filePath = self.find_file(json_files_folder_path,fileName)  
+                                        if filePath:
+                                             print(f"found jpeg image") 
                                    #print(f"Searching for image with ID {id}: expected path {filePath}")
                                    if filePath:
+                                        #print(f"found img with name {fileName}\n")
                                         img_b64 = self.convert_img_base_64(filePath)
                                         if "png" in ext:
                                              img_href = f"data:image/png;base64,{img_b64}"
@@ -65,6 +73,7 @@ class ImageHandler:
         return ans
      
     def find_file(self, start_dir, hash_filename):
+        #print(f"Searching for image with filename:{hash_filename}")
          # Logic from find_file function
         lc_target = hash_filename.lower()
         for dirpath, dirnames, filenames in os.walk(start_dir):
@@ -87,7 +96,7 @@ class ImageHandler:
               return None
      
 
-    def create_image(self, ch):
+    def create_image(self, ch, imageTable):
      # Logic from create_image function
      img = 0
      resourceID = ch['resourceId'] #this is the same as the "ID" of the image dict
@@ -97,17 +106,24 @@ class ImageHandler:
                if "fit" in ch['fills'][0]['image'] and ch['fills'][0]['image']['fit'] != "fill":
                          print("not fill")
      if resourceID in self.href_table:
-          href = self.href_table.get(resourceID) 
+          href = self.href_table.get(resourceID)
+          #here is where i'd want to lookup if the image is in "imageTable" 
           x = ch['x']['value']
           y = ch['y']['value']
           width = ch['width']['value']
           height = ch['height']['value']
+          if resourceID in imageTable:
+             #  print(f"found image id {resourceID} in the table")
+               attrs = imageTable[resourceID]
+               x, y, width, height = attrs.x, attrs.y, attrs.width, attrs.height
+               #print(f"Using custom attributes for image")
           img = svgwrite.image.Image(href=href, insert=(x,y),size=(width,height))   
        #   print(f"Image created with href., position: ({x}, {y}), size: ({width}, {height})")     
           if (ch['isFixedAspectRatio']):
                          img.fit(horiz='center',vert='middle', scale='meet')  
      else:
-          print(f"Image with resourceID {resourceID} not found in href table.")
+          print(f"Image with name {ch['name']} not found in href table.")
+          print("\n")
      if ch['isVisible']:
           return img
      elif not ch['isVisible']:
