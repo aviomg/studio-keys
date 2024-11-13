@@ -75,6 +75,10 @@ def download(filename):
     zip_path = os.path.join(app.config['ZIP_FOLDER'], filename)
     return send_file(zip_path,as_attachment=True)
 
+@app.route('/contribute')
+def contribute():
+    return render_template('contribute.html')
+
 if __name__ == '__main__':
     ensure_directories_exist()
     app.run(debug=True)
