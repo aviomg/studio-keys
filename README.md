@@ -2,7 +2,7 @@
 
 A Python-based tool designed that enables the easy retrieval and recovery of otherwise inaccessible UI/UX designs created with the now-extinct Invision prototyping tool.
 
-[Click here to access the web application!](https://studio-keys.onrender.com/)
+[Click here to access the web application!](https://studio-keys.onrender.com/) (Please excuse possibly slow loading times when first accessing the page--I am using a free version of Render which spins down with 15 minutes of inactivity).
 
 ## Motivation
 My mom is a painter, and she gave me an interesting analogy. Imagine you were an artist who has spent endless man-hours developing this diverse portfolio of oil paintings. You kept these valuable pieces in a temperature-controlled storage locker, where they'd be safe but easily accessible when you need them.
