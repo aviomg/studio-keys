@@ -1,6 +1,6 @@
 node_modules
 testvenv
-
+/extra/
 /assets/
 undefined.svg
 /10-28/
