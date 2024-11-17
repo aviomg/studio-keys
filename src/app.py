@@ -17,11 +17,21 @@ storage = GoogleStorage(files)
 
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
 app = Flask(__name__)
+base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+upload_folder = os.path.join(base_dir,'assets','uploads')
+output_folder = os.path.join(base_dir,'assets','outputs')
+zip_folder = os.path.join(base_dir, 'assets','zips')
+
+app.config['UPLOAD_FOLDER'] = upload_folder
+app.config['OUTPUT_FOLDER'] = output_folder
+app.config['ZIP_FOLDER'] = zip_folder
+app.secret_key = 'Drmhze6EPcv0fN_81Bj-nA'
+
 app.config.update(
-        GOOGLE_STORAGE_LOCAL_DEST = r"/Users/avikumar/Desktop/studio keys/studio-keys",
+        GOOGLE_STORAGE_LOCAL_DEST = upload_folder,
         GOOGLE_STORAGE_SIGNATURE = {"expiration": timedelta(minutes=5)},
         GOOGLE_STORAGE_FILES_BUCKET = "my-app-bucket-123",
-        GOOGLE_APPLICATION_CREDENTIALS = "os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')",
+        GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'),
         GOOGLE_STORAGE_RESOLVE_CONFLICTS = True
     )
 storage.init_app(app)
@@ -44,15 +54,7 @@ class StudioFile(db.Model):
 with app.app_context():
     db.create_all()
 '''
-base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-upload_folder = os.path.join(base_dir,'assets','uploads')
-output_folder = os.path.join(base_dir,'assets','outputs')
-zip_folder = os.path.join(base_dir, 'assets','zips')
 
-app.config['UPLOAD_FOLDER'] = upload_folder
-app.config['OUTPUT_FOLDER'] = output_folder
-app.config['ZIP_FOLDER'] = zip_folder
-app.secret_key = 'Drmhze6EPcv0fN_81Bj-nA'
 
 def ensure_directories_exist():
     """Ensures that the necessary directories exist."""
@@ -71,7 +73,9 @@ def index():
             return redirect(url_for('redirect_message',message_type="notfound"))
         f = request.files['studio_file']
         if f.filename == '':
-            return redirect(url_for('redirect_message',message_type="result"))
+            error_message = "Please upload a file before attempting to generate SVGs."
+            return render_template("form.html", error_message=error_message)
+            #return redirect(url_for('redirect_message',message_type="result"))
 
         secure_name = secure_filename(f.filename)
         #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
