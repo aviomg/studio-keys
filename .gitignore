@@ -1,5 +1,6 @@
 /files/
 node_modules
+/templates/uploads.html
 testvenv
 /extra/
 /assets/
