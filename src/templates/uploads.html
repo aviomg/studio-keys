@@ -1,0 +1,22 @@
+<html>
+<head>
+    <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
+
+</head>
+
+<body>
+    <h1>Uploaded Files</h1>
+    <ul>
+        {% for file in uploads %}
+        <li>
+            {{ file.filename }} - Uploaded at {{ file.upload_time }}
+            path is {{file.filepath}}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+
+
+
+
+</html>
