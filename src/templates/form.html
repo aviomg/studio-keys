@@ -15,7 +15,7 @@
             <a href="https://github.com/aviomg/studio-keys">Github Repo |</a>
         </span>
         <span class="text-blue-600">
-            <a href="https://www.linkedin.com/in/avi-kumar-5041642b0/">My Linkedin |</a>
+            <a href="https://www.linkedin.com/in/jahnavikumar/">My Linkedin |</a>
         </span>
         <span class="text-xl underline text-center mt-2 mb-2 text-green-600">
             <a href="{{ url_for('contribute') }}" > Contribute to this project</a>
@@ -39,6 +39,9 @@
        </h1>
        <h1>
         <button class="ml-10 bg-pink-500 text-pink-300 border-pink-600 border-b p-4 m-4 mr-0 rounded hover:text-white" type="submit">Generate SVGs</button>
+        {% if error_message %}
+        <p class="ml-10 font-bold text-red-500">{{ error_message }}</p>
+    {% endif %}
         {% if download_link %}
         <span class="text-md font-bold text-purple-500">&#8594;</span>
         <span id="downloadLink" >
