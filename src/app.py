@@ -6,7 +6,6 @@ from werkzeug.datastructures import FileStorage
 import os
 from zip_utils import create_zip
 import shutil
-from flask_sqlalchemy import SQLAlchemy
 from flask_googlestorage import GoogleStorage, Bucket
 from datetime import timedelta
 
