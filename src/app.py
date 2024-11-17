@@ -2,13 +2,49 @@ from flask import *
 from file_utils import FileUtils  # Import your existing classes/functions here
 from fileinput import filename
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 import os
 from zip_utils import create_zip
 import shutil
+from flask_sqlalchemy import SQLAlchemy
+from flask_googlestorage import GoogleStorage, Bucket
+from datetime import timedelta
+
+from io import BytesIO
+
+files = Bucket("files")
+storage = GoogleStorage(files)
 
 
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
 app = Flask(__name__)
+app.config.update(
+        GOOGLE_STORAGE_LOCAL_DEST = r"/Users/avikumar/Desktop/studio keys/studio-keys",
+        GOOGLE_STORAGE_SIGNATURE = {"expiration": timedelta(minutes=5)},
+        GOOGLE_STORAGE_FILES_BUCKET = "my-app-bucket-123",
+        GOOGLE_APPLICATION_CREDENTIALS = "os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')",
+        GOOGLE_STORAGE_RESOLVE_CONFLICTS = True
+    )
+storage.init_app(app)
 
+
+
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///studio_files.db'
+# For PostgreSQL (on Render), use:
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#db = SQLAlchemy(app)
+'''
+class StudioFile(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    filename = db.Column(db.String(100), nullable=False)
+    filepath = db.Column(db.String(200), nullable=False)
+    upload_time = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+# Initialize the database
+with app.app_context():
+    db.create_all()
+'''
 base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 upload_folder = os.path.join(base_dir,'assets','uploads')
 output_folder = os.path.join(base_dir,'assets','outputs')
@@ -38,14 +74,24 @@ def index():
         if f.filename == '':
             return redirect(url_for('redirect_message',message_type="result"))
 
-        uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
+        secure_name = secure_filename(f.filename)
+        #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
+        uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_name)
         f.save(uploaded_files_path)
+
+    
+        files.save(file_storage=f,name=secure_name)
+
+      #  new_file = StudioFile(filename=secure_name,filepath=uploaded_files_path)
+       # db.session.add(new_file)
+        #db.session.commit()
 
         file_processor = FileUtils(uploaded_files_path, output_folder)
         file_processor.run_studio_keys()
 
        # print(f"calling create zip with filename {f.filename}")
-        zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
+        #zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
+        zip_path = create_zip(output_folder,secure_name,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
         zip_filename = os.path.basename(zip_path)
         download_link = url_for('download',filename=zip_filename)
 
@@ -68,6 +114,11 @@ def redirect_message(message_type):
     #return render_template('acknowledgement.html')
 
 
+#@app.route('/uploads')
+#def list_uploads():
+   # uploads = StudioFile.query.all()
+    #return render_template('uploads.html',uploads=uploads)
+
 
 @app.route('/download/<filename>')
 def download(filename):
@@ -79,9 +130,14 @@ def download(filename):
 def contribute():
     return render_template('contribute.html')
 
+
+
+
 if __name__ == '__main__':
     ensure_directories_exist()
     app.run(debug=True)
+
+
 
 
 '''@app.route('/success',methods = ['POST'])
