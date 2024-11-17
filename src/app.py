@@ -81,8 +81,6 @@ def index():
         #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
         uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_name)
         f.save(uploaded_files_path)
-
-    
         files.save(file_storage=f,name=secure_name)
 
       #  new_file = StudioFile(filename=secure_name,filepath=uploaded_files_path)
@@ -98,8 +96,18 @@ def index():
         zip_filename = os.path.basename(zip_path)
         download_link = url_for('download',filename=zip_filename)
 
+        # Clean up temporary folders after saving to Google Cloud
         shutil.rmtree(file_processor.session_output_folder,ignore_errors=True)
-
+        for folder in [app.config['UPLOAD_FOLDER'],app.config['OUTPUT_FOLDER'],app.config['ZIP_FOLDER']]:
+            for file in os.listdir(folder):
+                file_path = os.path.join(folder,file)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)  # Remove the file
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)  # Remove the directory
+                except Exception as e:
+                    app.logger.error(f"Failed to delete {file_path}. Reason: {e}")
 
         return render_template('form.html',download_link = download_link, download_filename=zip_filename)
     return render_template("form.html")
@@ -132,9 +140,6 @@ def download(filename):
 @app.route('/contribute')
 def contribute():
     return render_template('contribute.html')
-
-
-
 
 if __name__ == '__main__':
     ensure_directories_exist()
