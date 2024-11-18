@@ -77,12 +77,12 @@ def create_artboard(artboard, name,save_to):
               r = create_rectangle(ch)
               dwg.add(r)  
     logger.info("about to call process element many times")
-    log_resource_usage
+    log_resource_usage()
     for ch in artboard['children']:
          if ch['type'] != 'rectangle':
           process_element(dwg,dwg,ch)
     logger.info("done calling process element many times")
-    log_resource_usage
+    log_resource_usage()
     dwg.save()
 
 def process_element(dwg, parent_group, element):
@@ -231,5 +231,5 @@ def studio_file_name(src_path):
 def log_resource_usage():
     usage = resource.getrusage(resource.RUSAGE_SELF)
     logger.info(f"Memory usage: {usage.ru_maxrss} KB")
-    logger.info(f"User time: {usage.ru_utime} seconds")
-    logger.info(f"System time: {usage.ru_stime} seconds")
+   # logger.info(f"User time: {usage.ru_utime} seconds")
+   # logger.info(f"System time: {usage.ru_stime} seconds")

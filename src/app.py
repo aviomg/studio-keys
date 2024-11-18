@@ -84,7 +84,7 @@ def create_app():
 
             # Clean up temporary folders after saving to Google Cloud
             shutil.rmtree(file_processor.session_output_folder,ignore_errors=True)
-            for folder in [app.config['UPLOAD_FOLDER'],app.config['OUTPUT_FOLDER'],app.config['ZIP_FOLDER']]:
+            for folder in [app.config['UPLOAD_FOLDER'],app.config['OUTPUT_FOLDER']]:
                 for file in os.listdir(folder):
                     file_path = os.path.join(folder,file)
                     try:
