@@ -10,7 +10,8 @@ from flask_googlestorage import GoogleStorage, Bucket
 from datetime import timedelta
 import logging
 from io import BytesIO
-import psutil
+import resource
+
 
 files = Bucket("files")
 storage = GoogleStorage(files)
@@ -146,14 +147,11 @@ def ensure_directories_exist(upload_folder, output_folder, zip_folder):
     os.makedirs(zip_folder, exist_ok=True)
 
 def log_resource_usage():
-    process = psutil.Process()
-    mem_info = process.memory_info()
-    logger.info(
-        "Memory usage: RSS=%s bytes, VMS=%s bytes, CPU percent: %s%%",
-        mem_info.rss,  # Resident Set Size
-        mem_info.vms,  # Virtual Memory Size
-        process.cpu_percent(interval=1.0)
-    )
+    usage = resource.getrusage(resource.RUSAGE_SELF)
+    logger.info(f"Memory usage: {usage.ru_maxrss} KB")
+    logger.info(f"User time: {usage.ru_utime} seconds")
+    logger.info(f"System time: {usage.ru_stime} seconds")
+
 
 if __name__ == '__main__':
     #ensure_directories_exist()
