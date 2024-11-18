@@ -10,7 +10,11 @@ class ImageHandler:
     def __init__(self, json_data, json_files_folder_path,studio_file_path_name):
         self.json_files_folder_path = json_files_folder_path
         self.studio_file_name = self.get_studio_file_name(studio_file_path_name)
+        logger.info("before creating href table:")
+        log_resource_usage()
         self.href_table = self.create_href_table(json_data, json_files_folder_path)
+        logger.info("after creating href and before creating size table")
+        log_resource_usage()
         self.size_table = self.create_size_table(json_data)
         
     def get_studio_file_name(self,studio_file_path_name):
@@ -39,8 +43,6 @@ class ImageHandler:
                                         #print("trying again with jpeg")
                                         fileName = hash + ".jpeg"
                                         filePath = self.find_file(json_files_folder_path,fileName)  
-                                        if filePath:
-                                             print(f"found jpeg image") 
                                    #print(f"Searching for image with ID {id}: expected path {filePath}")
                                    if filePath:
                                         #print(f"found img with name {fileName}\n")
@@ -112,12 +114,8 @@ class ImageHandler:
           if "image" in ch['fills'][0]:
                if "fit" in ch['fills'][0]['image'] and ch['fills'][0]['image']['fit'] != "fill":
                          print("not fill")
-     logger.info("before checking href table")
-     log_resource_usage()
      if resourceID in self.href_table:
           href = self.href_table.get(resourceID)
-          logger.info("after getting resource id from href table")
-          log_resource_usage()
           #here is where i'd want to lookup if the image is in "imageTable" 
           x = ch['x']['value']
           y = ch['y']['value']
@@ -151,5 +149,5 @@ class ImageHandler:
 def log_resource_usage():
      usage = resource.getrusage(resource.RUSAGE_SELF)
      logger.info(f"Memory usage: {usage.ru_maxrss} KB")
-     logger.info(f"User time: {usage.ru_utime} seconds")
-     logger.info(f"System time: {usage.ru_stime} seconds")
+    # logger.info(f"User time: {usage.ru_utime} seconds")
+     #logger.info(f"System time: {usage.ru_stime} seconds")
