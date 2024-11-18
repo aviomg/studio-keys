@@ -2,7 +2,10 @@
 import os
 import base64
 import svgwrite
-
+import logging
+import resource
+logging.basicConfig(level=logging.INFO)  # Change to DEBUG for even more detail
+logger = logging.getLogger(__name__)
 class ImageHandler:
     def __init__(self, json_data, json_files_folder_path,studio_file_path_name):
         self.json_files_folder_path = json_files_folder_path
@@ -89,8 +92,12 @@ class ImageHandler:
     
     def convert_img_base_64(self, image_path):
          try:
+              encoded = b""
               with open(image_path, "rb") as image_file:
-                   return base64.b64encode(image_file.read()).decode('utf-8')
+                   #return base64.b64encode(image_file.read()).decode('utf-8')
+                   while chunk := image_file.read(4096):
+                        encoded+= base64.b64encode(chunk)
+              return encoded.decode('utf-8')
          except Exception as e:
               print(f"Error encoding image: {e}")
               return None
@@ -105,8 +112,12 @@ class ImageHandler:
           if "image" in ch['fills'][0]:
                if "fit" in ch['fills'][0]['image'] and ch['fills'][0]['image']['fit'] != "fill":
                          print("not fill")
+     logger.info("before checking href table")
+     log_resource_usage()
      if resourceID in self.href_table:
           href = self.href_table.get(resourceID)
+          logger.info("after getting resource id from href table")
+          log_resource_usage()
           #here is where i'd want to lookup if the image is in "imageTable" 
           x = ch['x']['value']
           y = ch['y']['value']
@@ -137,3 +148,8 @@ class ImageHandler:
     def get_image_size(self, id):
         return self.size_table.get(id)
         # Retrieve image size from size_table
+def log_resource_usage():
+     usage = resource.getrusage(resource.RUSAGE_SELF)
+     logger.info(f"Memory usage: {usage.ru_maxrss} KB")
+     logger.info(f"User time: {usage.ru_utime} seconds")
+     logger.info(f"System time: {usage.ru_stime} seconds")

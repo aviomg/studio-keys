@@ -76,12 +76,17 @@ def create_artboard(artboard, name,save_to):
          if ch['type'] == 'rectangle':
               r = create_rectangle(ch)
               dwg.add(r)  
+    logger.info("about to call process element many times")
+    log_resource_usage
     for ch in artboard['children']:
          if ch['type'] != 'rectangle':
           process_element(dwg,dwg,ch)
+    logger.info("done calling process element many times")
+    log_resource_usage
     dwg.save()
 
 def process_element(dwg, parent_group, element):
+     
      """Creates each SVG element and adds it to the given SVG. Handles nested elements, which are labeled in the JSON file as children of type 'group'.
           dwg = the base SVG drawing onto which all created elements are directly or indirectly added.
           parent_group = the SVG group element onto which elements of a group are added (parent_group is eventually added to "dwg".) Used for handling JSON children of type 'group'.
@@ -158,11 +163,10 @@ def process_element(dwg, parent_group, element):
                          parent_group.add(el)
           elif element['type'] == 'image':
               # print(f"processing image with name {element['name']}")
-               logger.info("about to call image handler for an image")
-               log_resource_usage()
+              # logger.info("about to call image handler for an image")
+               #log_resource_usage()
                img = image_handler.create_image(element,imageTable)
-               logger.info("returned from create_image")
-               log_resource_usage()
+               #log_resource_usage()
                if img != 0:
                     parent_group.add(img)
 
