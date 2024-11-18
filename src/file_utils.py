@@ -164,6 +164,12 @@ class FileUtils:
     
     def run_studio_keys(self):
         for srcpath, dest in self.snapshot_file_dict.items():
+            logger.info("about to create folder for mockup")
+            log_resource_usage()
             dest_path = self.create_folder(dest)
             #(f"sending srcpath as {srcpath} for {dest}")
+            logger.info("about to call create_mockups")
+            log_resource_usage()
             create_mockups(srcpath,dest_path, self.json_folder_path)
+            logger.info("returned from create_mockups")
+            log_resource_usage()
