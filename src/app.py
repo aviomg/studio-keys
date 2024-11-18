@@ -8,11 +8,14 @@ from zip_utils import create_zip
 import shutil
 from flask_googlestorage import GoogleStorage, Bucket
 from datetime import timedelta
-
+import logging
 from io import BytesIO
+import psutil
 
 files = Bucket("files")
 storage = GoogleStorage(files)
+logging.basicConfig(level=logging.INFO)  # Change to DEBUG for even more detail
+logger = logging.getLogger(__name__)
 
 def create_app():
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
@@ -52,15 +55,24 @@ def create_app():
                 return render_template("form.html", error_message=error_message)
                 #return redirect(url_for('redirect_message',message_type="result"))
             secure_name = secure_filename(f.filename)
+            logger.info("validated the uploaded file")
+            log_resource_usage()
             #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
             uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_name)
             f.save(uploaded_files_path)
+            logger.info("saved the filestorage object; about to save to GCS")
+            log_resource_usage()
             files.save(file_storage=f,name=secure_name)
+            logger.info("File successfully saved to Google Cloud Storage")
         #  new_file = StudioFile(filename=secure_name,filepath=uploaded_files_path)
         # db.session.add(new_file)
             #db.session.commit()
+            logger.info("Starting file processing")
+            log_resource_usage()
             file_processor = FileUtils(uploaded_files_path, app.config['OUTPUT_FOLDER'])
             file_processor.run_studio_keys()
+            logger.info("Completed file processing")
+            log_resource_usage()
         # print(f"calling create zip with filename {f.filename}")
             #zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
             zip_path = create_zip(app.config['OUTPUT_FOLDER'],secure_name,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
@@ -133,7 +145,15 @@ def ensure_directories_exist(upload_folder, output_folder, zip_folder):
     os.makedirs(output_folder, exist_ok=True)
     os.makedirs(zip_folder, exist_ok=True)
 
-
+def log_resource_usage():
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    logger.info(
+        "Memory usage: RSS=%s bytes, VMS=%s bytes, CPU percent: %s%%",
+        mem_info.rss,  # Resident Set Size
+        mem_info.vms,  # Virtual Memory Size
+        process.cpu_percent(interval=1.0)
+    )
 
 if __name__ == '__main__':
     #ensure_directories_exist()
