@@ -14,27 +14,98 @@ from io import BytesIO
 files = Bucket("files")
 storage = GoogleStorage(files)
 
-
+def create_app():
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
-app = Flask(__name__)
-base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-upload_folder = os.path.join(base_dir,'assets','uploads')
-output_folder = os.path.join(base_dir,'assets','outputs')
-zip_folder = os.path.join(base_dir, 'assets','zips')
+    app = Flask(__name__)
+    base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    upload_folder = os.path.join(base_dir,'assets','uploads')
+    output_folder = os.path.join(base_dir,'assets','outputs')
+    zip_folder = os.path.join(base_dir, 'assets','zips')
 
-app.config['UPLOAD_FOLDER'] = upload_folder
-app.config['OUTPUT_FOLDER'] = output_folder
-app.config['ZIP_FOLDER'] = zip_folder
-app.secret_key = 'Drmhze6EPcv0fN_81Bj-nA'
+    app.config['UPLOAD_FOLDER'] = upload_folder
+    app.config['OUTPUT_FOLDER'] = output_folder
+    app.config['ZIP_FOLDER'] = zip_folder
+    app.secret_key = 'Drmhze6EPcv0fN_81Bj-nA'
 
-app.config.update(
+    app.config.update(
         GOOGLE_STORAGE_LOCAL_DEST = upload_folder,
         GOOGLE_STORAGE_SIGNATURE = {"expiration": timedelta(minutes=5)},
         GOOGLE_STORAGE_FILES_BUCKET = "my-app-bucket-123",
         GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'),
         GOOGLE_STORAGE_RESOLVE_CONFLICTS = True
     )
-storage.init_app(app)
+    storage.init_app(app)
+    ensure_directories_exist(upload_folder, output_folder, zip_folder)
+
+
+    @app.route('/',methods=['POST','GET']) 
+    def index():
+        ensure_directories_exist(upload_folder,output_folder,zip_folder) 
+        if request.method == 'POST':
+            if request.form.get("action") == "return_home":
+                return render_template("form.html")
+            if "studio_file" not in request.files:
+                return redirect(url_for('redirect_message',message_type="notfound"))
+            f = request.files['studio_file']
+            if f.filename == '':
+                error_message = "Please upload a file before attempting to generate SVGs."
+                return render_template("form.html", error_message=error_message)
+                #return redirect(url_for('redirect_message',message_type="result"))
+            secure_name = secure_filename(f.filename)
+            #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
+            uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_name)
+            f.save(uploaded_files_path)
+            files.save(file_storage=f,name=secure_name)
+        #  new_file = StudioFile(filename=secure_name,filepath=uploaded_files_path)
+        # db.session.add(new_file)
+            #db.session.commit()
+            file_processor = FileUtils(uploaded_files_path, app.config['OUTPUT_FOLDER'])
+            file_processor.run_studio_keys()
+        # print(f"calling create zip with filename {f.filename}")
+            #zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
+            zip_path = create_zip(app.config['OUTPUT_FOLDER'],secure_name,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
+            zip_filename = os.path.basename(zip_path)
+            download_link = url_for('download',filename=zip_filename)
+
+            # Clean up temporary folders after saving to Google Cloud
+            shutil.rmtree(file_processor.session_output_folder,ignore_errors=True)
+            for folder in [app.config['UPLOAD_FOLDER'],app.config['OUTPUT_FOLDER'],app.config['ZIP_FOLDER']]:
+                for file in os.listdir(folder):
+                    file_path = os.path.join(folder,file)
+                    try:
+                        if os.path.isfile(file_path) or os.path.islink(file_path):
+                            os.unlink(file_path)  # Remove the file
+                        elif os.path.isdir(file_path):
+                            shutil.rmtree(file_path)  # Remove the directory
+                    except Exception as e:
+                        app.logger.error(f"Failed to delete {file_path}. Reason: {e}")
+
+            return render_template('form.html',download_link = download_link, download_filename=zip_filename)
+        return render_template("form.html")
+
+
+    @app.route('/redirect/<message_type>')
+    def redirect_message(message_type):
+        if message_type == "result":
+            message = "You did not upload a file."
+        elif message_type == "notfound":
+            message = "Relevant file not found in uploads."
+        else:
+            message = "Uknown error."
+        return render_template('redirect.html', message=message)
+        #return render_template('acknowledgement.html')
+
+    @app.route('/download/<filename>')
+    def download(filename):
+        #zip_path = os.path.join("/Users/avikumar/Desktop/studio keys/studio-keys/assets/zips",filename)
+        zip_path = os.path.join(app.config['ZIP_FOLDER'], filename)
+        return send_file(zip_path,as_attachment=True)
+
+    @app.route('/contribute')
+    def contribute():
+        return render_template('contribute.html')
+
+    return app
 
 
 
@@ -56,93 +127,17 @@ with app.app_context():
 '''
 
 
-def ensure_directories_exist():
+def ensure_directories_exist(upload_folder, output_folder, zip_folder):
     """Ensures that the necessary directories exist."""
     os.makedirs(upload_folder, exist_ok=True)
     os.makedirs(output_folder, exist_ok=True)
     os.makedirs(zip_folder, exist_ok=True)
 
 
-@app.route('/',methods=['POST','GET']) 
-def index():
-    ensure_directories_exist() 
-    if request.method == 'POST':
-        if request.form.get("action") == "return_home":
-            return render_template("form.html")
-        if "studio_file" not in request.files:
-            return redirect(url_for('redirect_message',message_type="notfound"))
-        f = request.files['studio_file']
-        if f.filename == '':
-            error_message = "Please upload a file before attempting to generate SVGs."
-            return render_template("form.html", error_message=error_message)
-            #return redirect(url_for('redirect_message',message_type="result"))
-
-        secure_name = secure_filename(f.filename)
-        #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
-        uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_name)
-        f.save(uploaded_files_path)
-        files.save(file_storage=f,name=secure_name)
-
-      #  new_file = StudioFile(filename=secure_name,filepath=uploaded_files_path)
-       # db.session.add(new_file)
-        #db.session.commit()
-
-        file_processor = FileUtils(uploaded_files_path, output_folder)
-        file_processor.run_studio_keys()
-
-       # print(f"calling create zip with filename {f.filename}")
-        #zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
-        zip_path = create_zip(output_folder,secure_name,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
-        zip_filename = os.path.basename(zip_path)
-        download_link = url_for('download',filename=zip_filename)
-
-        # Clean up temporary folders after saving to Google Cloud
-        shutil.rmtree(file_processor.session_output_folder,ignore_errors=True)
-        for folder in [app.config['UPLOAD_FOLDER'],app.config['OUTPUT_FOLDER'],app.config['ZIP_FOLDER']]:
-            for file in os.listdir(folder):
-                file_path = os.path.join(folder,file)
-                try:
-                    if os.path.isfile(file_path) or os.path.islink(file_path):
-                        os.unlink(file_path)  # Remove the file
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)  # Remove the directory
-                except Exception as e:
-                    app.logger.error(f"Failed to delete {file_path}. Reason: {e}")
-
-        return render_template('form.html',download_link = download_link, download_filename=zip_filename)
-    return render_template("form.html")
-
-
-@app.route('/redirect/<message_type>')
-def redirect_message(message_type):
-    if message_type == "result":
-        message = "You did not upload a file."
-    elif message_type == "notfound":
-        message = "Relevant file not found in uploads."
-    else:
-        message = "Uknown error."
-    return render_template('redirect.html', message=message)
-    #return render_template('acknowledgement.html')
-
-
-#@app.route('/uploads')
-#def list_uploads():
-   # uploads = StudioFile.query.all()
-    #return render_template('uploads.html',uploads=uploads)
-
-
-@app.route('/download/<filename>')
-def download(filename):
-    #zip_path = os.path.join("/Users/avikumar/Desktop/studio keys/studio-keys/assets/zips",filename)
-    zip_path = os.path.join(app.config['ZIP_FOLDER'], filename)
-    return send_file(zip_path,as_attachment=True)
-
-@app.route('/contribute')
-def contribute():
-    return render_template('contribute.html')
 
 if __name__ == '__main__':
-    ensure_directories_exist()
+    #ensure_directories_exist()
+    app = create_app()
     app.run(debug=True)
 
 
