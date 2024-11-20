@@ -1,6 +1,5 @@
 
 import os
-from base64io import Base64IO
 import base64
 import svgwrite
 import logging
