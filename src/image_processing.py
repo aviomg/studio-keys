@@ -60,7 +60,11 @@ class ImageHandler:
          if not filepath:
               print(f"No file found for resource ID {resource_id}")
               return None
+         logger.info("in get_image_href, before calling convertb64")
+         log_resource_usage()
          img_b64 = self.convert_img_base_64(filepath)
+         logger.info("in get_image_href, after calling convertb64")
+         log_resource_usage()
          ext = os.path.splitext(filepath)[1].lower()
          if "png" in ext:
               return f"data:image/png;base64,{img_b64}"
@@ -168,8 +172,7 @@ class ImageHandler:
     # if resourceID in self.href_table:
     #      href = self.href_table.get(resourceID)
      if resourceID in self.image_map:
-          href = self.get_image_href(resourceID) #generate href on demand
-          #here is where i'd want to lookup if the image is in "imageTable" 
+          #here is where i'd want to lookup if the image is in "imageTable"
           x = ch['x']['value']
           y = ch['y']['value']
           width = ch['width']['value']
@@ -179,6 +182,11 @@ class ImageHandler:
                attrs = imageTable[resourceID]
                x, y, width, height = attrs.x, attrs.y, attrs.width, attrs.height
                #print(f"Using custom attributes for image")
+          logger.info("before generating href:")
+          log_resource_usage()
+          href = self.get_image_href(resourceID) #generate href on demand
+          logger.info("after generating href")
+          log_resource_usage() 
           img = svgwrite.image.Image(href=href, insert=(x,y),size=(width,height))   
        #   print(f"Image created with href., position: ({x}, {y}), size: ({width}, {height})")     
           if (ch['isFixedAspectRatio']):

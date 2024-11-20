@@ -76,8 +76,8 @@ def create_artboard(artboard, name,save_to):
          if ch['type'] == 'rectangle':
               r = create_rectangle(ch)
               dwg.add(r)  
-    logger.info("about to call process element many times")
-    log_resource_usage()
+   # logger.info("about to call process element many times")
+    #log_resource_usage()
     for ch in artboard['children']:
          if ch['type'] != 'rectangle':
           process_element(dwg,dwg,ch)
@@ -138,18 +138,18 @@ def process_element(dwg, parent_group, element):
                   imageTable[id] = attributes(x, y, width, height)
                  # print(f"added image id {id} to table with width={width} and height={height}")
      #Handles children of type 'group' by recursively calling process_element on each child of the group:
-        logger.info("before for ch in group children 1")
-        log_resource_usage()
+      #  logger.info("before for ch in group children 1")
+       # log_resource_usage()
         for ch in group_children:
             if ch['type'] == 'rectangle' and "container" in ch['name']:
                  process_element(dwg, group, ch)
-        logger.info("before for ch in group children 2")
-        log_resource_usage()
+      #  logger.info("before for ch in group children 2")
+     #   log_resource_usage()
         for ch in group_children:
             if ch['type'] == 'rectangle' and  "container" not in ch['name']:
                  process_element(dwg, group, ch)
-        logger.info("before for ch in group children 3")
-        log_resource_usage()
+     #   logger.info("before for ch in group children 3")
+      #  log_resource_usage()
         for ch in group_children:
             if ch['type'] != 'rectangle':
                  process_element(dwg,tgroup,ch) 
@@ -159,8 +159,8 @@ def process_element(dwg, parent_group, element):
           if element['type'] == 'rectangle':
                rect = create_rectangle(element)
                parent_group.add(rect)
-               logger.info("after adding a rect element")
-               log_resource_usage()
+        #       logger.info("after adding a rect element")
+         #      log_resource_usage()
           elif element['type'] == 'text':
                el = final_create_text(element)
                if el:
@@ -169,12 +169,12 @@ def process_element(dwg, parent_group, element):
                               parent_group.add(line)
                     else:
                          parent_group.add(el)
-               logger.info("after adding a text element")
-               log_resource_usage()
+            #   logger.info("after adding a text element")
+             #  log_resource_usage()
           elif element['type'] == 'image':
               # print(f"processing image with name {element['name']}")
-              # logger.info("about to call image handler for an image")
-               #log_resource_usage()
+               logger.info("about to call image handler for an image")
+               log_resource_usage()
                img = image_handler.create_image(element,imageTable)
                logger.info("after creating an image")
                log_resource_usage()
