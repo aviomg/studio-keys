@@ -1,5 +1,6 @@
 
 import os
+from base64io import Base64IO
 import base64
 import svgwrite
 import logging
@@ -137,19 +138,25 @@ class ImageHandler:
         print(f"File {hash_filename} not found in {start_dir}")
         return None
     
-    def convert_img_base_64(self, image_path):
-       #  try:
-        #      encoded = b""
+    def convert_img_base_64(self, image_path):     
+          try:
+              basestr = ""
+              with open(image_path, "rb") as image_file:
+                 #  return base64.b64encode(image_file.read()).decode('utf-8')
+                   while chunk := image_file.read(4002):
+                        basestr += base64.b64encode(chunk).decode('utf-8')
+              return basestr
+          except Exception as e:
+              print(f"Error encoding image: {e}")
+              return None
+              
+              """
               with open(image_path, "rb") as image_file:
                    return base64.b64encode(image_file.read()).decode('utf-8')
-                   '''
-                   while chunk := image_file.read(4096):
-                        encoded+= base64.b64encode(chunk)
-              return encoded.decode('utf-8')
-         except Exception as e:
-              print(f"Error encoding image: {e}")
-              return None'''
+              """
 
+              
+               
     def create_image(self, ch, imageTable):
      # Logic from create_image function
      img = 0
