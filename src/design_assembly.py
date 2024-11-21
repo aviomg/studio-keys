@@ -38,7 +38,14 @@ def create_mockups(src_path,dest_path, json_files_folder_path):
                     name = name1.replace("/","-")
                     #if name == "branch-guest-1280.svg":
                     #print("creating " + name)
+                    logger.info(f"before calling create artboard for {name}")
+                    log_resource_usage()
                     create_artboard(artboard,name, dest_path)
+                    logger.info(f"after calling cr artboard for {name}")
+                    log_resource_usage()
+     del image_handler
+     logger.info("done generating mockups")
+     log_resource_usage()
 
 def create_artboard(artboard, name,save_to):
     """Creates a singular mockup (an "artboard").
@@ -84,6 +91,8 @@ def create_artboard(artboard, name,save_to):
     logger.info("done calling process element many times")
     log_resource_usage()
     dwg.save()
+    logger.info("saved dwg")
+    log_resource_usage()
 
 def process_element(dwg, parent_group, element):
      

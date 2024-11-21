@@ -141,14 +141,18 @@ class ImageHandler:
         print(f"File {hash_filename} not found in {start_dir}")
         return None
     
-    def convert_img_base_64(self, image_path):     
+    def convert_img_base_64(self, image_path):  
           try:
+              base64_chunks = []
               basestr = ""
               with open(image_path, "rb") as image_file:
                  #  return base64.b64encode(image_file.read()).decode('utf-8')
                    while chunk := image_file.read(4002):
-                        basestr += base64.b64encode(chunk).decode('utf-8')
-              return basestr
+                        base64_chunks.append(base64.b64encode(chunk).decode('utf-8'))
+                       # basestr += base64.b64encode(chunk).decode('utf-8')
+              #return basestr
+              result = "".join(base64_chunks)
+              return result
           except Exception as e:
               print(f"Error encoding image: {e}")
               return None

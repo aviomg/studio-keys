@@ -30,15 +30,17 @@ def create_app():
     app.config['OUTPUT_FOLDER'] = output_folder
     app.config['ZIP_FOLDER'] = zip_folder
     app.secret_key = 'Drmhze6EPcv0fN_81Bj-nA'
-
+    '''
     app.config.update(
         GOOGLE_STORAGE_LOCAL_DEST = upload_folder,
         GOOGLE_STORAGE_SIGNATURE = {"expiration": timedelta(minutes=5)},
         GOOGLE_STORAGE_FILES_BUCKET = "my-app-bucket-123",
         GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'),
-        GOOGLE_STORAGE_RESOLVE_CONFLICTS = True
+        GOOGLE_STORAGE_RESOLVE_CONFLICTS = True,
+        GOOGLE_STORAGE_DELETE_LOCAL = True
     )
     storage.init_app(app)
+    '''
     ensure_directories_exist(upload_folder, output_folder, zip_folder)
 
 
@@ -61,10 +63,13 @@ def create_app():
             #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
             uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_name)
             f.save(uploaded_files_path)
-            logger.info("saved the filestorage object; about to save to GCS")
-            log_resource_usage()
-            files.save(file_storage=f,name=secure_name)
-            logger.info("File successfully saved to Google Cloud Storage")
+          # logger.info("saved the filestorage object; about to save to GCS")
+          #  log_resource_usage()
+          #  files.save(file_storage=f,name=secure_name)
+           # logger.info("File successfully saved to Google Cloud Storage")
+            #log_resource_usage()
+          #  logger.info("deleted f")
+           # log_resource_usage()
         #  new_file = StudioFile(filename=secure_name,filepath=uploaded_files_path)
         # db.session.add(new_file)
             #db.session.commit()
