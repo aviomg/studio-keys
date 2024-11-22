@@ -17,7 +17,8 @@ InVision Studio was a popular prototyping tool for creating UI/UX designs (think
 
 Studio Keys is a Python program that:
 - Processes `.studio` files to extract the necessary data in JSON format.
-- Parses and processes the JSON files to convert the design elements (e.g., rectangles, text, images) into SVG format.
+- Parses and processes the JSON files to convert the design elements (e.g., rectangles, text, images) into SVG format, rendering one SVG for each "artboard".
+- Locates, processes, and encodes image files to base-64.
 - Outputs the SVG files, maintaining the correct layering and structure of the original design.
 
 The program allows a user to upload their `.studio` files, and then outputs a downloadable .zip containing an SVG for each artboard in the file.
@@ -29,7 +30,6 @@ The program allows a user to upload their `.studio` files, and then outputs a do
 - **Customizable for Diverse Needs**: The program can be tailored to meet specific requirements, whether by adjusting SVG layouts or tweaking conversion settings, offering flexibility for various design workflows.
 ### Usage
 - Navigate to the web application at https://studio-keys.onrender.com, and follow the instructions to upload a .studio file from your computer. The program will output a .zip file to a folder containing an SVG for each artboard rendered from the file. 
-- Studio Keys will delete your data after mockup creation is complete.
 
 ### Examples
 - I owe the motivation for this entire project to my manager, who tasked me with it to recover ~600 mockups that he possessed. He was kind enough to allow me to provide some of the mockups that I rendered for examples.
@@ -37,15 +37,15 @@ The program allows a user to upload their `.studio` files, and then outputs a do
 - View some sample generated mockups in /resources/sample_generated_svgs
 
 ### Call for Contributors
-- Want to be part of the process of improving this awesome program? I am in the continuous process of improving the program to create more precise, refined mockups, and the key to this is my database of diverse .studio files that I use to gain a better understanding of the logic behind the now-extinct Invision app. If you would like to volunteer your .studio files for this cause, please reach out to me at avikumar2048@gmail.com!
+- Want to be part of the process of improving this awesome program? I am in the continuous process of improving the program to create more precise, refined mockups, and the key to this is my database of diverse .studio files that I use to gain a better understanding of the logic behind the now-extinct Invision app. If you would like to volunteer your .studio files for this cause, please do so at [this google form](https://forms.gle/Cyv3TL1Z477RxHBcA).
 
-### Technical Details
-### How it Works
 ### Known Issues & Limitations
 ### Future work
 ### License
 ### Acknowledgements
 ### The Process/Lessons Learned
+### Technical Details
+### How it Works
 
 
 
