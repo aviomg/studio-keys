@@ -4,16 +4,18 @@ import base64
 import svgwrite
 import logging
 import resource
+from memory_profiler import profile
+
 logging.basicConfig(level=logging.INFO)  # Change to DEBUG for even more detail
 logger = logging.getLogger(__name__)
 class ImageHandler:
     def __init__(self, json_data, json_files_folder_path,studio_file_path_name):
         self.json_files_folder_path = json_files_folder_path
         self.studio_file_name = self.get_studio_file_name(studio_file_path_name)
-        logger.info("before creating image map table:")
+     #   logger.info("before creating image map table:")
         log_resource_usage()
         self.image_map = self.create_img_file_map(json_data,json_files_folder_path)
-        logger.info("Image file map created. about to create size table")
+      #  logger.info("Image file map created. about to create size table")
         log_resource_usage()
        # self.href_table = self.create_href_table(json_data, json_files_folder_path)
        # logger.info("after creating href and before creating size table")
@@ -53,7 +55,8 @@ class ImageHandler:
          else:
               print("no images and/or resources found in JSON")
          return imagemap
-    
+
+    @profile
     def get_image_href(self, resource_id):
          """Generate href string for a given image ID on demand."""
          filepath = self.image_map.get(resource_id) #obtains the file path associated with the image
@@ -141,17 +144,22 @@ class ImageHandler:
         print(f"File {hash_filename} not found in {start_dir}")
         return None
     
+    @profile
     def convert_img_base_64(self, image_path):  
           try:
               base64_chunks = []
               basestr = ""
               with open(image_path, "rb") as image_file:
+                   logger.info("after opening the image path file:")
+                   log_resource_usage()
                  #  return base64.b64encode(image_file.read()).decode('utf-8')
                    while chunk := image_file.read(4002):
                         base64_chunks.append(base64.b64encode(chunk).decode('utf-8'))
                        # basestr += base64.b64encode(chunk).decode('utf-8')
               #return basestr
               result = "".join(base64_chunks)
+              logger.info("before returning from convertimg")
+              log_resource_usage()
               return result
           except Exception as e:
               print(f"Error encoding image: {e}")

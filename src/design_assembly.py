@@ -6,6 +6,7 @@ from text_processing import TextProcessor
 from image_processing import ImageHandler
 import logging
 import resource
+import gc
 
 logging.basicConfig(level=logging.INFO)  # Change to DEBUG for even more detail
 logger = logging.getLogger(__name__)
@@ -38,11 +39,7 @@ def create_mockups(src_path,dest_path, json_files_folder_path):
                     name = name1.replace("/","-")
                     #if name == "branch-guest-1280.svg":
                     #print("creating " + name)
-                    logger.info(f"before calling create artboard for {name}")
-                    log_resource_usage()
                     create_artboard(artboard,name, dest_path)
-                    logger.info(f"after calling cr artboard for {name}")
-                    log_resource_usage()
      del image_handler
      logger.info("done generating mockups")
      log_resource_usage()
@@ -88,6 +85,10 @@ def create_artboard(artboard, name,save_to):
     for ch in artboard['children']:
          if ch['type'] != 'rectangle':
           process_element(dwg,dwg,ch)
+    gc.collect()
+    print(f"Uncollectable objects: {len(gc.garbage)}")
+    for obj in gc.garbage:
+         print(obj)
     logger.info("done calling process element many times")
     log_resource_usage()
     dwg.save()
@@ -183,7 +184,6 @@ def process_element(dwg, parent_group, element):
           elif element['type'] == 'image':
               # print(f"processing image with name {element['name']}")
                logger.info("about to call image handler for an image")
-               log_resource_usage()
                img = image_handler.create_image(element,imageTable)
                logger.info("after creating an image")
                log_resource_usage()

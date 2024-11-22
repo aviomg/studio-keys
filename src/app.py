@@ -11,7 +11,8 @@ from datetime import timedelta
 import logging
 from io import BytesIO
 import resource
-
+import gc
+gc.set_debug(gc.DEBUG_LEAK)
 
 files = Bucket("files")
 storage = GoogleStorage(files)
@@ -21,6 +22,8 @@ logger = logging.getLogger(__name__)
 def create_app():
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
     app = Flask(__name__)
+    print("Current working directory:", os.getcwd())
+    print("Initial GC thresholds:", gc.get_threshold())
     base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     upload_folder = os.path.join(base_dir,'assets','uploads')
     output_folder = os.path.join(base_dir,'assets','outputs')
@@ -30,7 +33,7 @@ def create_app():
     app.config['OUTPUT_FOLDER'] = output_folder
     app.config['ZIP_FOLDER'] = zip_folder
     app.secret_key = 'Drmhze6EPcv0fN_81Bj-nA'
-    '''
+
     app.config.update(
         GOOGLE_STORAGE_LOCAL_DEST = upload_folder,
         GOOGLE_STORAGE_SIGNATURE = {"expiration": timedelta(minutes=5)},
@@ -40,7 +43,6 @@ def create_app():
         GOOGLE_STORAGE_DELETE_LOCAL = True
     )
     storage.init_app(app)
-    '''
     ensure_directories_exist(upload_folder, output_folder, zip_folder)
 
 
@@ -63,13 +65,15 @@ def create_app():
             #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
             uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_name)
             f.save(uploaded_files_path)
-          # logger.info("saved the filestorage object; about to save to GCS")
-          #  log_resource_usage()
-          #  files.save(file_storage=f,name=secure_name)
-           # logger.info("File successfully saved to Google Cloud Storage")
-            #log_resource_usage()
-          #  logger.info("deleted f")
-           # log_resource_usage()
+            logger.info("saved the filestorage object; about to save to GCS")
+            log_resource_usage()
+            files.save(file_storage=f,name=secure_name)
+            logger.info("File successfully saved to Google Cloud Storage")
+            log_resource_usage()
+            gc.collect()
+            print(f"Uncollectable objects: {len(gc.garbage)}")
+            for obj in gc.garbage:
+                print(obj)
         #  new_file = StudioFile(filename=secure_name,filepath=uploaded_files_path)
         # db.session.add(new_file)
             #db.session.commit()
@@ -81,6 +85,10 @@ def create_app():
             file_processor.run_studio_keys()
             logger.info("Completed file processing")
             log_resource_usage()
+            gc.collect()
+            print(f"Uncollectable objects: {len(gc.garbage)}")
+            for obj in gc.garbage:
+                print(obj)
         # print(f"calling create zip with filename {f.filename}")
             #zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
             zip_path = create_zip(app.config['OUTPUT_FOLDER'],secure_name,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
