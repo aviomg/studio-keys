@@ -8,11 +8,15 @@ from zip_utils import create_zip
 import shutil
 from flask_googlestorage import GoogleStorage, Bucket
 from datetime import timedelta
-
+import logging
 from io import BytesIO
+import resource
+
 
 files = Bucket("files")
 storage = GoogleStorage(files)
+logging.basicConfig(level=logging.INFO)  # Change to DEBUG for even more detail
+logger = logging.getLogger(__name__)
 
 def create_app():
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
@@ -26,15 +30,17 @@ def create_app():
     app.config['OUTPUT_FOLDER'] = output_folder
     app.config['ZIP_FOLDER'] = zip_folder
     app.secret_key = 'Drmhze6EPcv0fN_81Bj-nA'
-
+    '''
     app.config.update(
         GOOGLE_STORAGE_LOCAL_DEST = upload_folder,
         GOOGLE_STORAGE_SIGNATURE = {"expiration": timedelta(minutes=5)},
         GOOGLE_STORAGE_FILES_BUCKET = "my-app-bucket-123",
         GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'),
-        GOOGLE_STORAGE_RESOLVE_CONFLICTS = True
+        GOOGLE_STORAGE_RESOLVE_CONFLICTS = True,
+        GOOGLE_STORAGE_DELETE_LOCAL = True
     )
     storage.init_app(app)
+    '''
     ensure_directories_exist(upload_folder, output_folder, zip_folder)
 
 
@@ -52,15 +58,29 @@ def create_app():
                 return render_template("form.html", error_message=error_message)
                 #return redirect(url_for('redirect_message',message_type="result"))
             secure_name = secure_filename(f.filename)
+            logger.info("validated the uploaded file")
+            log_resource_usage()
             #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
             uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_name)
             f.save(uploaded_files_path)
-            files.save(file_storage=f,name=secure_name)
+          # logger.info("saved the filestorage object; about to save to GCS")
+          #  log_resource_usage()
+          #  files.save(file_storage=f,name=secure_name)
+           # logger.info("File successfully saved to Google Cloud Storage")
+            #log_resource_usage()
+          #  logger.info("deleted f")
+           # log_resource_usage()
         #  new_file = StudioFile(filename=secure_name,filepath=uploaded_files_path)
         # db.session.add(new_file)
             #db.session.commit()
+            logger.info("Starting file processing, about to initiate fileutils object")
+            log_resource_usage()
             file_processor = FileUtils(uploaded_files_path, app.config['OUTPUT_FOLDER'])
+            logger.info("FileUtils initiated, about to run studio keys")
+            log_resource_usage()
             file_processor.run_studio_keys()
+            logger.info("Completed file processing")
+            log_resource_usage()
         # print(f"calling create zip with filename {f.filename}")
             #zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
             zip_path = create_zip(app.config['OUTPUT_FOLDER'],secure_name,app.config['ZIP_FOLDER'],file_processor.session_output_folder)
@@ -133,6 +153,11 @@ def ensure_directories_exist(upload_folder, output_folder, zip_folder):
     os.makedirs(output_folder, exist_ok=True)
     os.makedirs(zip_folder, exist_ok=True)
 
+def log_resource_usage():
+    usage = resource.getrusage(resource.RUSAGE_SELF)
+    logger.info(f"Memory usage: {usage.ru_maxrss} KB")
+    logger.info(f"User time: {usage.ru_utime} seconds")
+    logger.info(f"System time: {usage.ru_stime} seconds")
 
 
 if __name__ == '__main__':

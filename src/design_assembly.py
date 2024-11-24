@@ -4,15 +4,26 @@ import json
 from collections import namedtuple
 from text_processing import TextProcessor
 from image_processing import ImageHandler
+import logging
+import resource
+
+logging.basicConfig(level=logging.INFO)  # Change to DEBUG for even more detail
+logger = logging.getLogger(__name__)
 
 def create_mockups(src_path,dest_path, json_files_folder_path):
      """Runs the program to create all of the mockups in a single .studio file.
           src_path = path of the JSON source file
           dest_path = the location of where to store the output mockups"""
+     logger.info("about to open the src path and load the json data")
+     log_resource_usage()
      with open(src_path, 'r', encoding='utf-8') as f:
           data = json.load(f)
+     logger.info("about to instantiate imagehandler object")
+     log_resource_usage()
      global image_handler
      image_handler = ImageHandler(data,json_files_folder_path,src_path)
+     logger.info("image handler instantiated")
+     log_resource_usage()
 
      print(f"generating mockups from src: {studio_file_name(src_path)}:")
      if "children" in data:
@@ -27,7 +38,14 @@ def create_mockups(src_path,dest_path, json_files_folder_path):
                     name = name1.replace("/","-")
                     #if name == "branch-guest-1280.svg":
                     #print("creating " + name)
+                    logger.info(f"before calling create artboard for {name}")
+                    log_resource_usage()
                     create_artboard(artboard,name, dest_path)
+                    logger.info(f"after calling cr artboard for {name}")
+                    log_resource_usage()
+     del image_handler
+     logger.info("done generating mockups")
+     log_resource_usage()
 
 def create_artboard(artboard, name,save_to):
     """Creates a singular mockup (an "artboard").
@@ -65,12 +83,19 @@ def create_artboard(artboard, name,save_to):
          if ch['type'] == 'rectangle':
               r = create_rectangle(ch)
               dwg.add(r)  
+   # logger.info("about to call process element many times")
+    #log_resource_usage()
     for ch in artboard['children']:
          if ch['type'] != 'rectangle':
           process_element(dwg,dwg,ch)
+    logger.info("done calling process element many times")
+    log_resource_usage()
     dwg.save()
+    logger.info("saved dwg")
+    log_resource_usage()
 
 def process_element(dwg, parent_group, element):
+     
      """Creates each SVG element and adds it to the given SVG. Handles nested elements, which are labeled in the JSON file as children of type 'group'.
           dwg = the base SVG drawing onto which all created elements are directly or indirectly added.
           parent_group = the SVG group element onto which elements of a group are added (parent_group is eventually added to "dwg".) Used for handling JSON children of type 'group'.
@@ -122,12 +147,18 @@ def process_element(dwg, parent_group, element):
                   imageTable[id] = attributes(x, y, width, height)
                  # print(f"added image id {id} to table with width={width} and height={height}")
      #Handles children of type 'group' by recursively calling process_element on each child of the group:
+      #  logger.info("before for ch in group children 1")
+       # log_resource_usage()
         for ch in group_children:
             if ch['type'] == 'rectangle' and "container" in ch['name']:
                  process_element(dwg, group, ch)
+      #  logger.info("before for ch in group children 2")
+     #   log_resource_usage()
         for ch in group_children:
             if ch['type'] == 'rectangle' and  "container" not in ch['name']:
                  process_element(dwg, group, ch)
+     #   logger.info("before for ch in group children 3")
+      #  log_resource_usage()
         for ch in group_children:
             if ch['type'] != 'rectangle':
                  process_element(dwg,tgroup,ch) 
@@ -137,6 +168,8 @@ def process_element(dwg, parent_group, element):
           if element['type'] == 'rectangle':
                rect = create_rectangle(element)
                parent_group.add(rect)
+        #       logger.info("after adding a rect element")
+         #      log_resource_usage()
           elif element['type'] == 'text':
                el = final_create_text(element)
                if el:
@@ -145,9 +178,16 @@ def process_element(dwg, parent_group, element):
                               parent_group.add(line)
                     else:
                          parent_group.add(el)
+            #   logger.info("after adding a text element")
+             #  log_resource_usage()
           elif element['type'] == 'image':
               # print(f"processing image with name {element['name']}")
+               logger.info("about to call image handler for an image")
+               log_resource_usage()
                img = image_handler.create_image(element,imageTable)
+               logger.info("after creating an image")
+               log_resource_usage()
+               #log_resource_usage()
                if img != 0:
                     parent_group.add(img)
 
@@ -208,3 +248,9 @@ def format_color(colorElement):
 def studio_file_name(src_path):
      dir_name = os.path.dirname(src_path)
      return os.path.basename(dir_name) + ".studio"
+
+def log_resource_usage():
+    usage = resource.getrusage(resource.RUSAGE_SELF)
+    logger.info(f"Memory usage: {usage.ru_maxrss} KB")
+   # logger.info(f"User time: {usage.ru_utime} seconds")
+   # logger.info(f"System time: {usage.ru_stime} seconds")

@@ -2,8 +2,19 @@ import os
 import shutil
 from design_assembly import create_mockups
 import uuid
+import logging
+import resource
+import tracemalloc
 """Class for helper functions performing file managing and processing tasks, such as converting the .studio files into zip archives,
     extracting the necessary JSON file, directory organization, etc."""
+
+logging.basicConfig(level=logging.INFO)  # Change to DEBUG for even more detail
+logger = logging.getLogger(__name__)
+def log_resource_usage():
+    usage = resource.getrusage(resource.RUSAGE_SELF)
+    logger.info(f"Memory usage: {usage.ru_maxrss} KB")
+    logger.info(f"User time: {usage.ru_utime} seconds")
+    logger.info(f"System time: {usage.ru_stime} seconds")
 
 class FileUtils:
     output_json_folder_name = "Studio Keys - Output/JSON Data (Ignore)"
@@ -25,9 +36,14 @@ class FileUtils:
                 self.input_file_path = temp_dir
             else:
                 self.input_file_path = input_file_path
-        
+            logger.info("about to call create_jsons_folder_path")
+            log_resource_usage()
             self.json_folder_path = self.create_jsons_folder_path()
+            logger.info("about to call create_dict")
+            log_resource_usage()
+            tracemalloc.start()
             self.snapshot_file_dict = self.create_dict(self.input_file_path)
+            tracemalloc.stop()
         else:
             self.output_folder_location = output_folder_location
             self.session_output_folder = os.path.join(output_folder_location,f"Studio_Keys_Output")
@@ -45,6 +61,8 @@ class FileUtils:
             self.snapshot_file_dict = self.create_dict(self.input_file_path)
     
     def obtain_json(self,studio_file_path):
+        logger.info("obtaining json")
+        log_resource_usage()
         """studio_file_path = file path for a .studio mockup file to be converted. 
             Returns the file path of the corresponding extracted JSON file (snapshot.json)."""
         if os.path.isfile(studio_file_path):
@@ -58,6 +76,8 @@ class FileUtils:
             return None
 
     def change_extension(self, file_path, new_extension):
+        logger.info("changing extension")
+        log_resource_usage()
         """Helper function for obtain_json which converts .studio file into zip archive and extracts contents into a 
             separate subfolder. Creates a copy of original .studio file(s) and stores them in a different folder.
             file_path = file path of the orignal .studio file. new_extension = the desired file type extension"""
@@ -87,6 +107,8 @@ class FileUtils:
         return json_folder_path
 
     def extract_and_replace_zip(self,zip_path):
+        logger.info("extracting and replacing zip")
+        log_resource_usage()
         """Helper function for obtain_json which extracts the contents of zip archive."""
         if os.path.isfile(zip_path):
             extract_to = os.path.splitext(zip_path)[0]
@@ -122,7 +144,9 @@ class FileUtils:
             base_name, _ = os.path.splitext(filename)
             dest_for_svgs = f"/{base_name}"
             if os.path.isfile(full_path):
+                logger.info("Memory before JSON extraction: %s", tracemalloc.get_traced_memory())
                 jsonpath = self.obtain_json(full_path)
+                logger.info("Memory after JSON extraction: %s", tracemalloc.get_traced_memory())
                 if jsonpath:
                     mockup_dict[jsonpath] = dest_for_svgs
                 else:
@@ -140,6 +164,12 @@ class FileUtils:
     
     def run_studio_keys(self):
         for srcpath, dest in self.snapshot_file_dict.items():
+            logger.info("about to create folder for mockup")
+            log_resource_usage()
             dest_path = self.create_folder(dest)
             #(f"sending srcpath as {srcpath} for {dest}")
+            logger.info("about to call create_mockups")
+            log_resource_usage()
             create_mockups(srcpath,dest_path, self.json_folder_path)
+            logger.info("returned from create_mockups")
+            log_resource_usage()
