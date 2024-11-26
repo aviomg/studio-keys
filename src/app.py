@@ -60,6 +60,10 @@ def create_app():
         # db.session.add(new_file)
             #db.session.commit()
             file_processor = FileUtils(uploaded_files_path, app.config['OUTPUT_FOLDER'])
+            if file_processor.flag == True:
+                error_message = "There was an issue unzipping the uploaded file. You may have uploaded a file of size 0 bytes."
+                return render_template("form.html",error_message = error_message)
+                #print(f"calling this error rn!!!!")
             file_processor.run_studio_keys()
         # print(f"calling create zip with filename {f.filename}")
             #zip_path = create_zip(output_folder,f.filename,app.config['ZIP_FOLDER'],file_processor.session_output_folder)

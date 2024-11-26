@@ -25,9 +25,11 @@ class FileUtils:
                 self.input_file_path = temp_dir
             else:
                 self.input_file_path = input_file_path
-        
+
+            self.flag = False
             self.json_folder_path = self.create_jsons_folder_path()
             self.snapshot_file_dict = self.create_dict(self.input_file_path)
+
         else:
             self.output_folder_location = output_folder_location
             self.session_output_folder = os.path.join(output_folder_location,f"Studio_Keys_Output")
@@ -96,6 +98,7 @@ class FileUtils:
                 return extract_to
             except shutil.ReadError:
                 print(f"{os.path.basename(zip_path)} couldn't be unzipped. Skipping this file.")
+                self.flag = True
         else:
             print(f"Could not find file: {zip_path}")
 
