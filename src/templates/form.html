@@ -38,11 +38,13 @@
         </a>
     </div>
     <div class="text-center mx-auto mt-6 text-base max-w-6xl text-blue-800">
-        <p align="left">
+        <p>
      <span> As of now, Studio Keys only reliably handles conversion of .studio files smaller than ~38 MB. 
        If you upload a file larger than that, there is a possibility that the program will time out and you'll see a "502: Bad Gateway" page. 
        This has to do with some memory usage bugs in the deployment environment which I am resolving. However, I can manually convert larger .studio files and will do so for a small fee.</span><span class="font-bold"> If you would like a larger file converted, please 
-       fill out</span> <span><a href="https://docs.google.com/forms/d/e/1FAIpQLScDv90-5QcObXr8werj-9wcJq72ZZ-_6xKC7tiuvDlTSrtpQA/viewform?usp=sf_link" target="_blank" class="underline hover:text-green-700 font-bold transition-all duration-200 ease-in-out">this form.</a></span></p>
+       fill out</span> <span><a href="https://docs.google.com/forms/d/e/1FAIpQLScDv90-5QcObXr8werj-9wcJq72ZZ-_6xKC7tiuvDlTSrtpQA/viewform?usp=sf_link" target="_blank" class="underline hover:text-green-700 font-bold transition-all duration-200 ease-in-out">this form.
+       </a>
+    </span></p>
     </div>
     <br>
 <h1 class="m-2 ml-10">
@@ -66,7 +68,7 @@
         <button class="ml-10 bg-pink-500 text-pink-300 border-pink-600 border-b p-4 m-4 mr-0 
         rounded hover:text-white duration-200 ease-in-out" type="submit">Generate SVGs</button>
         {% if error_message %}
-        <p class="ml-10 font-bold text-red-500">{{ error_message }}</p>
+        <span class="text-black font-bold text-md">{{error_message}}</span>
     {% endif %}
         {% if download_link %}
         <span class="text-md font-bold text-purple-500">&#8594;</span>
