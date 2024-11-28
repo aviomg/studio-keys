@@ -14,7 +14,7 @@ files = Bucket("files")
 storage = GoogleStorage(files)
 
 def create_app():
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
+  #  os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
     app = Flask(__name__)
     base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     upload_folder = os.path.join(base_dir,'assets','uploads')
