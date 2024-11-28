@@ -8,14 +8,13 @@ from zip_utils import create_zip
 import shutil
 from flask_googlestorage import GoogleStorage, Bucket
 from datetime import timedelta
-
 from io import BytesIO
 
 files = Bucket("files")
 storage = GoogleStorage(files)
 
 def create_app():
-#os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/Users/avikumar/Desktop/trusty-monument-442003-v1-a2ec4155e268.json"
     app = Flask(__name__)
     base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     upload_folder = os.path.join(base_dir,'assets','uploads')
@@ -52,10 +51,15 @@ def create_app():
                 return render_template("form.html", error_message=error_message)
                 #return redirect(url_for('redirect_message',message_type="result"))
             secure_name = secure_filename(f.filename)
+          #  print(f"f.filename was {f.filename} and secure name is {secure_name}")
             #uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
             uploaded_files_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_name)
+            file_copy = BytesIO(f.read())  # Read the file stream into memory
+            file_copy.seek(0)  # Reset the stream pointer
+            f.seek(0)  # Reset the original file stream pointer
             f.save(uploaded_files_path)
-            files.save(file_storage=f,name=secure_name)
+            #files.save(file_storage=f,name=secure_name)
+            files.save(file_storage=FileStorage(file_copy,f.filename),name=secure_name)
         #  new_file = StudioFile(filename=secure_name,filepath=uploaded_files_path)
         # db.session.add(new_file)
             #db.session.commit()
