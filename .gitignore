@@ -2,6 +2,7 @@
 node_modules
 /templates/uploads.html
 testvenv
+imgtesting/
 /extra/
 /assets/
 undefined.svg

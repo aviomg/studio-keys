@@ -118,9 +118,10 @@ class ImageHandler:
                x, y, width, height = attrs.x, attrs.y, attrs.width, attrs.height
                #print(f"Using custom attributes for image")
           img = svgwrite.image.Image(href=href, insert=(x,y),size=(width,height))   
-       #   print(f"Image created with href., position: ({x}, {y}), size: ({width}, {height})")     
-          if (ch['isFixedAspectRatio']):
-                         img.fit(horiz='center',vert='middle', scale='meet')  
+       #   print(f"Image created with href., position: ({x}, {y}), size: ({width}, {height})")   
+          if "isFixedAspectRatio" in ch:
+               if (ch['isFixedAspectRatio']):
+                    img.fit(horiz='center',vert='middle', scale='meet')  
      else:
           print(f"Image with name {ch['name']} not found in href table.")
           print("\n")
