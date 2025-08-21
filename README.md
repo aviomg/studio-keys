@@ -5,7 +5,7 @@ A Python-based tool designed to enables the easy retrieval and recovery of other
 
 [Access the web application!](https://studio-keys.onrender.com/)
 
-[View the Github repo](https://github.com/aviomg/studio-keys) to view my code or access sample materials for the demo.
+[Visit the Github repo](https://github.com/aviomg/studio-keys) to view my code or access sample materials for the demo.
 
 ## Motivation
 My mom is a painter, and she gave me an interesting analogy. Imagine you were an artist who has spent endless man-hours developing this diverse portfolio of oil paintings. You kept these valuable pieces in a temperature-controlled storage locker, where they'd be safe but easily accessible when you need them.
